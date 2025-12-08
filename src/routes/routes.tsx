@@ -16,10 +16,10 @@ import Privacy from '../pages/dashboard/Privacy';
 import Users from '../pages/dashboard/Users';
 import BookingHistory from '../pages/dashboard/BookingHistory';
 import Transactions from '../pages/dashboard/Transactions';
-import Companies from '../pages/dashboard/Companies';
 import WhyChoose from '../pages/dashboard/WhyChoose';
 import Categories from '../pages/dashboard/category';
 import AllHadith from '../pages/dashboard/createHadith';
+import DailyAllHadith from '../pages/dashboard/createDailyHadith';
 
 const router = createBrowserRouter([
     {
@@ -33,7 +33,7 @@ const router = createBrowserRouter([
             { path: 'categories', element: <Categories /> },
             { path: 'hadith', element: <AllHadith /> },
             { path: 'reviews', element: <Review /> }, 
-            { path: 'companies', element: <Companies /> },
+            { path: 'daily-hadith', element: <DailyAllHadith /> },
             { path: 'why-choose', element: <WhyChoose /> },
             { path: 'transactions', element: <Transactions /> },
             { path: 'make-admin', element: <MakeAdmin /> },

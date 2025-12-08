@@ -26,6 +26,7 @@ const AddCompaniesModal = ({ isOpen, setIsOpen }: {
     return (
         <Modal
             title={<p className="text-xl text-primary font-semibold">Add Company Logo </p>}
+            
             open={isOpen}
             onCancel={() => {
                 setIsOpen(false);
