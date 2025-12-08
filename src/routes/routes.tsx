@@ -20,11 +20,17 @@ import WhyChoose from '../pages/dashboard/WhyChoose';
 import Categories from '../pages/dashboard/category';
 import AllHadith from '../pages/dashboard/createHadith';
 import DailyAllHadith from '../pages/dashboard/createDailyHadith';
+import ProtectedRoute from './protectedRoutes';
 
 const router = createBrowserRouter([
     {
         path: '/',
-        element: <App />,
+        // element: <App />,
+        element: (
+            <ProtectedRoute>
+                <App />
+            </ProtectedRoute>
+        ),
         errorElement: <ErrorPage />,
         children: [
             { path: '', element: <Dashboard /> },

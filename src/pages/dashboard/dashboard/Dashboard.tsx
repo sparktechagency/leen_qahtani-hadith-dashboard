@@ -1,5 +1,4 @@
-// import DashboardStats from './DashboardStats';
-// import EarningChart from './EarningChart';
+
 import UserChart from './UserChart';
 
 const Dashboard = () => {

@@ -1,89 +1,75 @@
-import { Button, ConfigProvider, Form, FormProps, Input } from 'antd';
-import { FieldNamesType } from 'antd/es/cascader';
-import { useNavigate } from 'react-router';
+import { Button, ConfigProvider, Form, FormProps, Input, message } from 'antd';
+import { useLocation, useNavigate } from 'react-router-dom';
+import axiosInstance from '../../utils/axiosInstance';
+
+interface ResetPasswordForm {
+    newPassword: string;
+    confirmPassword: string;
+}
 
 const NewPassword = () => {
     const navigate = useNavigate();
-    const onFinish: FormProps<FieldNamesType>['onFinish'] = (values) => {
-        console.log('Received values of form: ', values);
-        navigate('/');
-    };
+    const location = useLocation();
+    const email = (location.state as any)?.email;
+    const resetToken = (location.state as any)?.resetToken;
+
+const onFinish: FormProps<ResetPasswordForm>['onFinish'] = async (values) => {
+    if (values.newPassword !== values.confirmPassword) {
+        message.error("Passwords do not match!");
+        return;
+    }
+    
+    // DEBUG: Log the values being sent
+    console.log('Email:', email);
+    console.log('Reset Token:', resetToken);
+    console.log('Payload:', {
+        email,
+        newPassword: values.newPassword,
+        confirmPassword: values.confirmPassword,
+        token: resetToken,
+    });
+    
+    try {
+        await axiosInstance.post('/auth/reset-password', {
+            email,
+            newPassword: values.newPassword,
+            confirmPassword: values.confirmPassword,
+            token: resetToken, 
+        });
+        message.success("Password reset successfully!");
+        navigate('/login');
+    } catch (error: any) {
+        console.error('Full error:', error.response); 
+        message.error(error?.response?.data?.message || 'Failed to reset password!');
+    }
+};
 
     return (
-        <ConfigProvider
-            theme={{
-                token: {
-                    colorPrimary: '#286a25',
+        <ConfigProvider theme={{ token: { colorPrimary: '#286a25' } }}>
+            <div className="flex items-center justify-center h-screen" style={{ backgroundImage: `url('/auth.png')`, backgroundSize: 'cover' }}>
+                <div className="bg-white w-[630px] rounded-lg shadow-lg p-10">
+                    <h1 className="text-3xl font-medium text-center mt-2">Set New Password</h1>
 
-                    colorBgContainer: '#F1F4F9',
-                },
-                components: {
-                    Input: {
-                        borderRadius: 10,
-                        colorBorder: 'transparent',
-                        colorPrimaryBorder: 'transparent',
-                        hoverBorderColor: 'transparent',
-                        controlOutline: 'none',
-                        activeBorderColor: 'transparent',
-                    },
-                },
-            }}
-        >
-            <div className="flex items-center justify-center h-screen" style={{
-            backgroundImage: `url('/auth.png')`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'top',
-            backgroundRepeat: 'no-repeat',
-            objectFit: 'cover',
-        }}>
-                <div className="bg-white w-[630px] rounded-lg shadow-lg p-10 ">
-                    <div className="text-primaryText max-w-md mx-auto space-y-3 text-center">
-                        <h1 className="text-3xl  font-medium text-center mt-2">Set a new password</h1>
-                        <p>Create a new password. Ensure it differs from previous ones for security</p>
-                    </div>
-
-                    <Form
-                        name="normal_NewPassword"
-                        className="NewPassword-form"
-                        layout="vertical"
-                        initialValues={{ remember: true }}
-                        onFinish={onFinish}
-                    >
+                    <Form name="newPassword" layout="vertical" onFinish={onFinish}>
                         <Form.Item
-                            label={
-                                <label htmlFor="password" className="block text-primaryText mb-1 text-lg">
-                                    New Password
-                                </label>
-                            }
-                            name="new_password"
-                            rules={[{ required: true, message: 'Please input new password!' }]}
+                            label="New Password"
+                            name="newPassword"
+                            rules={[{ required: true, message: 'Please enter new password!' }]}
                         >
-                            <Input.Password placeholder="KK!@#$15856" className=" h-12 px-6" />
+                            <Input.Password placeholder="Enter new password" className="h-12" />
                         </Form.Item>
+
                         <Form.Item
-                            label={
-                                <label htmlFor="password" className="block text-primaryText mb-1 text-lg">
-                                    Confirm Password
-                                </label>
-                            }
-                            name="confirm_password"
-                            rules={[{ required: true, message: 'Please input confirm password!' }]}
+                            label="Confirm Password"
+                            name="confirmPassword"
+                            rules={[{ required: true, message: 'Please confirm password!' }]}
                         >
-                            <Input.Password placeholder="KK!@#$15856" className="h-12 px-6" />
+                            <Input.Password placeholder="Confirm new password" className="h-12" />
                         </Form.Item>
 
                         <Form.Item>
-                            <Button
-                                shape="round"
-                                type="primary"
-                                htmlType="submit"
-                                style={{
-                                    height: 45,
-                                    width: '100%',
-                                    fontWeight: 500,
-                                }}
-                            >
-                                Update Password
+                            <Button shape="round" type="primary" htmlType="submit" style={{ height: 45, width: '100%', fontWeight: 500 }}>
+                                Reset Password
                             </Button>
                         </Form.Item>
                     </Form>
