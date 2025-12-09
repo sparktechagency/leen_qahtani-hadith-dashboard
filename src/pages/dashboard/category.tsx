@@ -1,99 +1,25 @@
-// import { Button, Flex, Table } from "antd";
-// import { useEffect, useState } from "react";
-// import { AiOutlineEdit } from "react-icons/ai";
-// import { IoTrashOutline } from "react-icons/io5";
-// import AddCategoryModal from "../../components/modals/categoryModel";
-// import axiosInstance from "../../utils/axiosInstance";
-// import { getImageUrl } from "../../utils/imageUrl";
-
-// const categorys = () => {
-//     const [categories, setCategories] = useState([]);
-//     const [isOpen, setIsOpen] = useState(false);
-//     const [editData, setEditData] = useState<any>(null);
-
-//     const fetchCategories = async () => {
-//         const res = await axiosInstance.get("/category");
-//         setCategories(res.data.data || []);
-//     };
-
-//     useEffect(() => {
-//         fetchCategories();
-//     }, []);
-
-//     const columns = [
-//         {
-//             title: "Name",
-//             dataIndex: "name",
-//             key: "name",
-//         },
-
-//         {
-//     title: "Image",
-//     dataIndex: "image",
-//     key: "image",
-//     render: (img: string) => (
-//         <img
-//             src={getImageUrl(img)}
-//             alt="category"
-//             className="h-14 rounded-md object-cover"
-//         />
-//     ),
-// },
-//         {
-//             title: "Action",
-//             key: "action",
-//             render: (_: any, record: any) => (
-//                 <div className="flex items-center gap-3">
-//                     <button onClick={() => { setIsOpen(true); setEditData(record); }}>
-//                         <AiOutlineEdit className="text-xl text-primary" />
-//                     </button>
-//                     <button>
-//                         <IoTrashOutline className="text-xl text-red-500" />
-//                     </button>
-//                 </div>
-//             ),
-//         },
-//     ];
-
-//     return (
-//         <div>
-//             <Flex justify="space-between" align="center" className="my-2">
-//                 <h1 className="text-2xl text-primary font-semibold">Manage Categories</h1>
-
-//                 <Button type="primary" style={{ height: 40 }} onClick={() => { setIsOpen(true); setEditData(null); }}>
-//                     Add Category
-//                 </Button>
-//             </Flex>
-
-//             <Table dataSource={categories} columns={columns} pagination={{ pageSize: 8 }} />
-
-//             <AddCategoryModal
-//                 isOpen={isOpen}
-//                 setIsOpen={setIsOpen}
-//                 editData={editData}
-//                 onSuccess={fetchCategories}
-//             />
-//         </div>
-//     );
-// };
-
-import { Button, Table, Popconfirm, message } from "antd";
+import { Button, Table, Popconfirm, message, Input } from "antd";
 import { useEffect, useState } from "react";
 import { AiOutlineEdit } from "react-icons/ai";
 import { IoTrashOutline, IoLockClosedOutline, IoLockOpenOutline } from "react-icons/io5";
 import AddCategoryModal from "../../components/modals/categoryModel";
 import axiosInstance from "../../utils/axiosInstance";
 import { getImageUrl } from "../../utils/imageUrl";
+const { Search } = Input;
 
 const categorys = () => {
   const [categories, setCategories] = useState<any[]>([]);
+ const [filteredCategories, setFilteredCategories] = useState<any[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [editData, setEditData] = useState<any>(null);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const fetchCategories = async () => {
     try {
       const res = await axiosInstance.get("/category");
       setCategories(res.data.data || []);
+      setFilteredCategories(res.data.data || []);
+      filteredCategories;
     } catch (error) {
       console.log(error);
       message.error("Failed to fetch categories");
@@ -103,6 +29,20 @@ const categorys = () => {
   useEffect(() => {
     fetchCategories();
   }, []);
+
+// Search filter
+  useEffect(() => {
+    if (!searchTerm) {
+      setFilteredCategories(categories);
+    } else {
+      const term = searchTerm.toLowerCase();
+      const filtered = categories.filter((cat) =>
+        (cat.name || "").toLowerCase().includes(term) ||
+        (cat.status ? "active" : "inactive").includes(term)
+      );
+      setFilteredCategories(filtered);
+    }
+  }, [searchTerm, categories]);
 
   const toggleStatus = async (id: string, currentStatus: boolean) => {
     try {
@@ -134,7 +74,7 @@ const categorys = () => {
       key: "name",
     },
     {
-      title: "Image",
+      title: "Icon",
       dataIndex: "image",
       key: "image",
       render: (img: string) => (
@@ -198,18 +138,31 @@ const categorys = () => {
   return (
     <div>
       <div className="flex justify-between items-center my-2">
-        <h1 className="text-2xl text-primary font-semibold">Manage Categories</h1>
+        <h1 className="text-2xl text-primary font-semibold">Categories</h1>
+
+        <div className="flex items-center gap-2">
+          <Search
+            placeholder="Search categories..."
+            allowClear
+            onChange={(e) => setSearchTerm(e.target.value)}
+            style={{ width: 250 }}
+            
+          />
+        
+
         <Button
-          type="primary"
+          htmlType="button"
+          className="bg-[#82968D]"
           style={{ height: 40 }}
           onClick={() => { setIsOpen(true); setEditData(null); }}
         >
-          Add Category
-        </Button>
+          Add New
+        </Button >
+      </div>
       </div>
 
       <Table
-        dataSource={categories}
+        dataSource={filteredCategories}
         columns={columns}
         rowKey={(record) => record._id}
         pagination={{ pageSize: 8 }}

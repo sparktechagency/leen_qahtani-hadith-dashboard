@@ -128,7 +128,7 @@ toast.success(editData ? "Category updated successfully!" : "Category created su
                 {/* Submit */}
                 <Button
                     htmlType="submit"
-                    className="w-full h-11 mt-5 rounded-lg bg-[#748d84] text-white text-[16px] font-medium"
+                    className="w-full h-11 mt-5 rounded-lg bg-[#82968D] text-white text-[16px] font-medium"
                 >
                     {editData ? "Update Category" : "Confirm"}
                 </Button>
