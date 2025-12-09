@@ -44,31 +44,16 @@ const AddcategorysModal = ({
 
     try {
         if (editData) {
-            await axiosInstance.put(`/category/${editData.id}`, formData, {
-                headers: { "Content-Type": "multipart/form-data" },
-            });
+        await axiosInstance.patch(`/category/${editData._id}`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+        });
         } else {
             await axiosInstance.post(`/category`, formData, {
                 headers: { "Content-Type": "multipart/form-data" },
             });
         }
 
-        toast.success(
-    editData
-        ? "Category updated successfully!"
-        : "Category created successfully!",
-    {
-        position: "top-center",
-        duration: 2000,
-        style: {
-            borderRadius: "10px",
-            padding: "14px 18px",
-            background: "#f6ffed",
-            border: "1px solid #b7eb8f",
-        },
-    }
-);
-
+toast.success(editData ? "Category updated successfully!" : "Category created successfully!");
         onSuccess();
         setIsOpen(false);
         form.resetFields();
