@@ -1,8 +1,10 @@
 import MainLayout from './components/layout/MainLayout';
 import { ConfigProvider } from 'antd';
+import { Toaster } from "sonner";
 function App() {
     return (
         <>
+        <Toaster />
             <ConfigProvider
                 theme={{
                     token: {
