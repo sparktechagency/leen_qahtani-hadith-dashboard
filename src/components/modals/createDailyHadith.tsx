@@ -1,122 +1,119 @@
-import { Button, Form, Input, Select, Upload, Card } from "antd";
+import { Button, Form, Input, Select, Upload, Card, Switch, message } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
+import React, { useState } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
-import { useState } from "react";
+import axiosInstance from "../../utils/axiosInstance";
 
-type HadithData = {
-    title: string;
-    referencedCategory?: number;
-    description: string;
-    image?: string | null;
+type Category = { id: string; name: string };
+
+type HadithFormValues = {
+  title: string;
+  category: string;
+  refrence?: string;
+  icon?: string;
+  daily: boolean;
 };
 
-const CreateDailyHadithModal = ({
-    allCategories,
-}: {
-    allCategories: { id: number; name: string }[];
-}) => {
-    const [form] = Form.useForm();
-    const [description, setDescription] = useState<string>("");
-    const [imageUrl, setImageUrl] = useState<string | null>(null);
+const CreateDailyHadithModal = ({ allCategories }: { allCategories: Category[] }) => {
+  const [form] = Form.useForm();
+  const [description, setDescription] = useState<string>("");
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
 
-    const handleImageUpload = (info: any) => {
-        const file = info.file.originFileObj;
-        const url = URL.createObjectURL(file);
-        setImageUrl(url);
-    };
+  const handleImageUpload = (info: any) => {
+    const file = info.file.originFileObj;
+    setImageFile(file);
+    setImageUrl(URL.createObjectURL(file));
+  };
 
-    const handleSubmit = (values: HadithData) => {
-        const payload: HadithData & { image?: string | null } = {
-            ...values,
-            description: description,
-            image: imageUrl,
-        };
+const handleSubmit = async (values: HadithFormValues) => {
+  try {
+    const formData = new FormData();
 
-        console.log("FINAL SUBMIT DATA:", payload);
-    };
+    formData.append("title", values.title);
+    formData.append("category", values.category);
+    formData.append("description", description);
+    formData.append("daily", "true");
+    if (values.refrence) formData.append("refrence", values.refrence);
 
-    return (
-        <div className="p-5">
-            <Card title="Add Hadith" className="shadow-md">
+    if (imageFile) {
+      formData.append("icon", imageFile);
+    }
 
-                <Form form={form} layout="vertical" onFinish={handleSubmit}>
-                    
-                    {/* Hadith Title */}
-                    <Form.Item
-                        label="Hadith Title"
-                        name="title"
-                        rules={[{ required: true, message: "Title is required" }]}
-                    >
-                        <Input placeholder="Enter hadith title" style={{ height: 45 }} />
-                    </Form.Item>
+    const res = await axiosInstance.post("/hadith", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
 
-                    {/* Category Dropdown */}
-                    <Form.Item
-                        label="Referenced"
-                        name="referencedCategory"
-                    >
-                        <Select<number>
-                            placeholder="Select category"
-                            allowClear
-                            showSearch
-                            optionFilterProp="children"
-                        >
-                            {allCategories.map((cat) => (
-                                <Select.Option key={cat.id} value={cat.id}>
-                                    {cat.name}
-                                </Select.Option>
-                            ))}
-                        </Select>
-                    </Form.Item>
+    message.success("Hadith created successfully");
 
-                    {/* Rich Text Editor */}
-                    <Form.Item label="Description">
-                        <ReactQuill
-                            theme="snow"
-                            value={description}
-                            onChange={setDescription}
-                            style={{ height: 200, marginBottom: 50 }}
-                        />
-                    </Form.Item>
+    form.resetFields();
+    setDescription("");
+    setImageFile(null);
+    setImageUrl(null);
+  } catch (err: any) {
+    console.error("CreateHadith error:", err.response?.data || err);
+    message.error("Failed to create Hadith");
+  }
+};
 
-                    {/* Image Upload */}
-                    <Form.Item label="Hadith Image (optional)">
-                        <Upload
-                            accept="image/*"
-                            showUploadList={false}
-                            beforeUpload={() => false}
-                            onChange={handleImageUpload}
-                        >
-                            <Button icon={<UploadOutlined />}>Upload Image</Button>
-                        </Upload>
+  return (
+    <div className="p-5">
+      <Card title="Add Hadith" className="shadow-md">
+<Form form={form} layout="vertical" onFinish={handleSubmit} initialValues={{ daily: true }}>
+  <Form.Item
+    label="Hadith Title"
+    name="title"
+    rules={[{ required: true, message: "Title is required" }]}
+  >
+    <Input placeholder="Enter hadith title" />
+  </Form.Item>
 
-                        {imageUrl && (
-                            <img
-                                src={imageUrl}
-                                alt="Preview"
-                                style={{
-                                    marginTop: 15,
-                                    height: 160,
-                                    borderRadius: 10,
-                                    objectFit: "cover",
-                                }}
-                            />
-                        )}
-                    </Form.Item>
+  <Form.Item label="Reference" name="refrence">
+    <Input placeholder="Enter reference" />
+  </Form.Item>
 
-                    {/* Submit Button */}
-                    <Form.Item>
-                        <Button type="primary" htmlType="submit" style={{ height: 45, width: "100%" }}>
-                            Add Daily Hadith
-                        </Button>
-                    </Form.Item>
+  <Form.Item
+    label="Category"
+    name="category"
+    rules={[{ required: true, message: "Category is required" }]}
+  >
+    <Select<string> placeholder="Select category">
+      {allCategories.map(cat => (
+        <Select.Option key={cat.id} value={cat.id}>{cat.name}</Select.Option>
+      ))}
+    </Select>
+  </Form.Item>
 
-                </Form>
+  {/* <Form.Item label="Daily" name="daily" valuePropName="checked">
+    <Switch defaultChecked disabled />
+    
+  </Form.Item> */}
 
-            </Card>
-        </div>
-    );
+  <Form.Item label="Description">
+    <ReactQuill value={description} onChange={setDescription} />
+  </Form.Item>
+
+  <Form.Item label="Hadith Image (optional)">
+    <Upload
+      accept="image/*"
+      showUploadList={false}
+      beforeUpload={() => false}
+      onChange={handleImageUpload}
+    >
+      <Button icon={<UploadOutlined />}>Upload Image</Button>
+    </Upload>
+    {imageUrl && <img src={imageUrl} alt="Preview" style={{ height: 150 }} />}
+  </Form.Item>
+
+  <Form.Item>
+    <Button type="primary" htmlType="submit">Add Hadith</Button>
+  </Form.Item>
+</Form>
+      </Card>
+    </div>
+  );
 };
 
 export default CreateDailyHadithModal;
+

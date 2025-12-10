@@ -111,8 +111,8 @@ toast.success(editData ? "Category updated successfully!" : "Category created su
                     ) : (
                         <>
                             <PiImageThin className="text-4xl text-gray-500 mb-2" />
-                            <p className="text-gray-600 font-medium">Upload License Photo</p>
-                            <p className="text-xs text-gray-500">PDF, PNG, JPG or DOC</p>
+                            <p className="text-gray-600 font-medium">upload category image or icon</p>
+                            <p className="text-xs text-gray-500">PNG, JPG</p>
                         </>
                     )}
                 </label>
@@ -128,7 +128,7 @@ toast.success(editData ? "Category updated successfully!" : "Category created su
                 {/* Submit */}
                 <Button
                     htmlType="submit"
-                    className="w-full h-11 mt-5 rounded-lg bg-[#82968D] text-white text-[16px] font-medium"
+                    className=" w-full h-11 bg-blue-600 text-white rounded-lg mt-6"
                 >
                     {editData ? "Update Category" : "Confirm"}
                 </Button>

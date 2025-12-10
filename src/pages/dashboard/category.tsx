@@ -72,6 +72,7 @@ const categorys = () => {
       title: "Name",
       dataIndex: "name",
       key: "name",
+      align: "center" as const,
     },
     {
       title: "Icon",
@@ -81,7 +82,7 @@ const categorys = () => {
         <img
           src={getImageUrl(img)}
           alt="category"
-          className="h-14 rounded-md object-cover"
+          className="h-14 w-14 rounded-md object-cover"
         />
       ),
     },
@@ -90,15 +91,15 @@ const categorys = () => {
       dataIndex: "status",
       key: "status",
       render: (_: any, record: any) => (
-        <button onClick={() => toggleStatus(record._id, record.status)}>
+        <button className="flex items-center gap-1">
           {record.status ? (
             <div className="flex items-center gap-1">
               
-              <span>Active</span>
+              <span className="text-green-600 font-medium">Active</span>
             </div>
           ) : (
             <div className="flex items-center gap-1">
-              <span>Inactive</span>
+              <span className="text-red-600 font-medium">Inactive</span>
             </div>
           )}
         </button>
@@ -137,10 +138,10 @@ const categorys = () => {
 
   return (
     <div>
-      <div className="flex justify-between items-center my-2">
+      <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl text-primary font-semibold">Categories</h1>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           <Search
             placeholder="Search categories..."
             allowClear

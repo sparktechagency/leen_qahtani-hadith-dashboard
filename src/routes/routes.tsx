@@ -21,6 +21,7 @@ import Categories from '../pages/dashboard/category';
 import AllHadith from '../pages/dashboard/createHadith';
 import DailyAllHadith from '../pages/dashboard/createDailyHadith';
 import ProtectedRoute from './protectedRoutes';
+import HadithManagement from '../pages/dashboard/createHadith';
 
 const router = createBrowserRouter([
     {
@@ -37,7 +38,7 @@ const router = createBrowserRouter([
             { path: 'users', element: <Users /> },
             { path: 'booking-history', element: <BookingHistory /> },
             { path: 'categories', element: <Categories /> },
-            { path: 'hadith', element: <AllHadith /> },
+            { path: 'hadith', element: <HadithManagement /> },
             { path: 'reviews', element: <Review /> }, 
             { path: 'daily-hadith', element: <DailyAllHadith /> },
             { path: 'why-choose', element: <WhyChoose /> },
