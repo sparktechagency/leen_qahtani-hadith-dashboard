@@ -1,9 +1,8 @@
-import { Button, Form, Input, Select, Upload, Card, Switch, message } from "antd";
+import { Button, Form, Input, Select, Upload, Card, message } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
-import React, { useState } from "react";
+import { useState } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
-import axiosInstance from "../../utils/axiosInstance";
 
 type Category = { id: string; name: string };
 
@@ -41,9 +40,9 @@ const handleSubmit = async (values: HadithFormValues) => {
       formData.append("icon", imageFile);
     }
 
-    const res = await axiosInstance.post("/hadith", formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
+    // const res = await axiosInstance.post("/hadith", formData, {
+    //   headers: { "Content-Type": "multipart/form-data" },
+    // });
 
     message.success("Hadith created successfully");
 

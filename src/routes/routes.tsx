@@ -18,7 +18,6 @@ import BookingHistory from '../pages/dashboard/BookingHistory';
 import Transactions from '../pages/dashboard/Transactions';
 import WhyChoose from '../pages/dashboard/WhyChoose';
 import Categories from '../pages/dashboard/category';
-import AllHadith from '../pages/dashboard/createHadith';
 import DailyAllHadith from '../pages/dashboard/createDailyHadith';
 import ProtectedRoute from './protectedRoutes';
 import HadithManagement from '../pages/dashboard/createHadith';

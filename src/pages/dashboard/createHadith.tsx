@@ -53,7 +53,7 @@ const HadithManagement: React.FC = () => {
   const [editData, setEditData] = useState<HadithData | null>(null);
   const [description, setDescription] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [, setImageUrl] = useState<string | null>(null);
   const [form] = Form.useForm();
 
   // Fetch data
@@ -126,11 +126,11 @@ const HadithManagement: React.FC = () => {
     }
   };
 
-  const handleImageUpload = (info: any) => {
-    const file = info.file.originFileObj || info.file;
-    setImageFile(file);
-    setImageUrl(URL.createObjectURL(file));
-  };
+  // const handleImageUpload = (info: any) => {
+  //   const file = info.file.originFileObj || info.file;
+  //   setImageFile(file);
+  //   setImageUrl(URL.createObjectURL(file));
+  // };
 
   const handleSubmit = async (values: any) => {
     try {

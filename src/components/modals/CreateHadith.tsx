@@ -1,6 +1,6 @@
 import { Button, Form, Input, Select, Upload, Card, Switch, message } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
-import React, { useState } from "react";
+import  { useState } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import axiosInstance from "../../utils/axiosInstance";
