@@ -1,20 +1,55 @@
-import React, { useState } from 'react';
-import { Button, Form, Input } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Button, Form, Input, message } from 'antd';
 import { CiEdit } from 'react-icons/ci';
+import axiosInstance from '../../../utils/axiosInstance';
+const BASE_URL = import.meta.env.VITE_API_URL_IMAGE;
 
-interface FormValues {
-    name: string;
-    email: string;
-    image: File | null;
+interface EditProfileProps {
+    user: any;
+    reload: () => void;
 }
 
-const EditProfile: React.FC = () => {
-    const [imagePreview, setImagePreview] = useState<string>('/user.png');
+const EditProfile: React.FC<EditProfileProps> = ({ user, reload }) => {
+    const [imagePreview, setImagePreview] = useState('/user.png');
     const [file, setFile] = useState<File | null>(null);
 
-    const onFinish = (values: FormValues) => {
-        console.log('Received values of form: ', values);
-        values.image = file;
+    const [form] = Form.useForm();
+
+    useEffect(() => {
+        if (user) {
+            form.setFieldsValue({
+                name: user.name,
+                email: user.email,
+            });
+
+            if (user.profile) {
+
+                setImagePreview(BASE_URL + '/' + user.profile);
+            } else {
+                setImagePreview('/user.png');
+            }
+        }
+    }, [user]);
+
+    const onFinish = async (values: any) => {
+        try {
+            const formData = new FormData();
+            formData.append('name', values.name);
+            formData.append('email', values.email);
+            if (file) {
+                formData.append('image', file);
+            }
+
+            await axiosInstance.put('/user/profile', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
+
+            message.success('Profile updated successfully!');
+            reload();
+        } catch (err) {
+            console.log(err);
+            message.error('Failed to update profile');
+        }
     };
 
     const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -31,9 +66,9 @@ const EditProfile: React.FC = () => {
 
     return (
         <div className="max-w-lg mx-auto">
-            <Form name="update_profile" layout="vertical" initialValues={{ remember: true }} onFinish={onFinish}>
-                {/* Banner Image */}
-                <div className="flex justify-center">
+            <Form form={form} name="update_profile" layout="vertical" onFinish={onFinish}>
+                
+                <div className="flex justify-center mb-4">
                     <div className="w-[150px] h-[150px] relative">
                         <img
                             src={imagePreview}
@@ -58,11 +93,7 @@ const EditProfile: React.FC = () => {
                 </div>
 
                 <Form.Item
-                    label={
-                        <label htmlFor="name" className="block text-primaryText mb-1 text-lg">
-                            Full Name
-                        </label>
-                    }
+                    label="Full Name"
                     name="name"
                     rules={[{ required: true, message: 'Please input your full name!' }]}
                 >
@@ -70,11 +101,7 @@ const EditProfile: React.FC = () => {
                 </Form.Item>
 
                 <Form.Item
-                    label={
-                        <label htmlFor="email" className="block text-primaryText mb-1 text-lg">
-                            Email
-                        </label>
-                    }
+                    label="Email"
                     name="email"
                     rules={[{ required: true, message: 'Please input your email!' }]}
                 >
@@ -82,13 +109,7 @@ const EditProfile: React.FC = () => {
                 </Form.Item>
 
                 <Form.Item className="flex justify-center">
-                    <Button
-                        style={{
-                            height: 42,
-                        }}
-                        type="primary"
-                        htmlType="submit"
-                    >
+                    <Button type="primary" htmlType="submit" style={{ height: 42 }}>
                         Update Profile
                     </Button>
                 </Form.Item>

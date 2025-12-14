@@ -10,7 +10,6 @@ import {
   Popconfirm,
   Space,
   Upload,
-  Switch,
 } from "antd";
 import {
   IoEyeOutline,
@@ -19,7 +18,7 @@ import {
   IoPencil,
   IoTrashOutline,
 } from "react-icons/io5";
-import Icon, { UploadOutlined } from "@ant-design/icons";
+import { UploadOutlined } from "@ant-design/icons";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import axiosInstance from "../../utils/axiosInstance";
@@ -348,8 +347,10 @@ const DailyAllHadith: React.FC = () => {
         </Select>
 
         <Button
-          type="primary"
-          style={{ background: "#2e7d32", border: "none" }}
+          htmlType="button"
+          className="bg-[#82968D]"
+          style={{ height: 40 }}
+          // style={{ background: "#2e7d32", border: "none" }}
           onClick={() => {
             setEditData(null);
             form.resetFields();

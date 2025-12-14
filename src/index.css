@@ -38,3 +38,14 @@
 .ant-form-item{
     margin-bottom: 15px !important;
 }
+
+/* Fix: Prevent Parent SubMenu text from turning white when a child is active */
+:where(.css-dev-only-do-not-override-1k979oh).ant-menu-light .ant-menu-submenu-selected > .ant-menu-submenu-title,
+.ant-menu-light .ant-menu-submenu-selected > .ant-menu-submenu-title {
+    color: rgba(0, 0, 0, 0.88) !important;
+}
+
+/* Fix: Prevent Parent SubMenu Icon from turning white */
+.ant-menu-light .ant-menu-submenu-selected > .ant-menu-submenu-title .ant-menu-item-icon {
+    color: rgba(0, 0, 0, 0.88) !important;
+}

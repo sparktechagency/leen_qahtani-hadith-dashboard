@@ -34,16 +34,18 @@ const sidebarItems: TSidebarItem[] = [
         icon: <PiBuildingOffice size={24} />,
     },
 
+
 {
   key: 'settings',
-  label: <span className="settings-text">Settings</span>,
+  label: <span className="settings-text text-gray-700">Settings</span>, 
   icon: <AiOutlineQuestionCircle size={24} />,
   children: [
-    { key: 'faqs', label: 'FAQ', path: 'faqs' },
-    { key: 'privacy', label: 'privacy', path: 'privacy' },
-    { key: 'terms', label: 'terms-conditions', path: 'terms' },
+    { key: 'about', label: <span className="menu-text">About</span>, path: 'about' },
+    { key: 'privacy', label: <span className="menu-text">Privacy</span>, path: 'privacy' },
+    { key: 'terms', label: <span className="menu-text">Terms</span>, path: 'terms' },
   ],
 },
+
     {
         key: 'logout',
         label: 'Log Out',

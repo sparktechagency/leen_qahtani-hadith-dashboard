@@ -329,7 +329,8 @@ const HadithManagement: React.FC = () => {
         </Select>
 
         <Button
-          type="primary"
+          htmlType="button"
+          // className="bg-[#82968D]"
           style={{ background: "#2e7d32", border: "none" }}
           onClick={() => {
             setEditData(null);

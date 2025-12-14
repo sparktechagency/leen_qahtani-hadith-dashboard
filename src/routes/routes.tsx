@@ -6,7 +6,6 @@ import Login from '../pages/authentication/Login';
 import ErrorPage from '../pages/error/ErrorPage';
 import Review from '../pages/dashboard/Review';
 import TermsCondition from '../pages/dashboard/TermsCondition';
-import FAQs from '../pages/dashboard/FAQs';
 import Notification from '../pages/dashboard/Notification';
 import ForgetPassword from '../pages/authentication/ForgetPassword';
 import VerifyOtp from '../pages/authentication/VerifyOtp';
@@ -21,6 +20,7 @@ import Categories from '../pages/dashboard/category';
 import DailyAllHadith from '../pages/dashboard/createDailyHadith';
 import ProtectedRoute from './protectedRoutes';
 import HadithManagement from '../pages/dashboard/createHadith';
+import About from '../pages/dashboard/About';
 
 const router = createBrowserRouter([
     {
@@ -45,7 +45,7 @@ const router = createBrowserRouter([
             { path: 'make-admin', element: <MakeAdmin /> },
             { path: 'terms', element: <TermsCondition /> },
             { path: 'privacy', element: <Privacy /> },
-            { path: 'faqs', element: <FAQs /> },
+            { path: 'about', element: <About /> },
             { path: 'notification', element: <Notification /> },
             { path: 'profile', element: <Profile /> },
         ],

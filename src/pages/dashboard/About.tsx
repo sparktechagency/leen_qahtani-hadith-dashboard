@@ -3,7 +3,7 @@ import JoditEditor from "jodit-react";
 import { Button, message } from "antd";
 import axios from "../../utils/axiosInstance"; 
 
-const Privacy = () => {
+const About = () => {
     const editor = useRef(null);
     const [content, setContent] = useState("");
     const [loading, setLoading] = useState(false);
@@ -17,9 +17,9 @@ const Privacy = () => {
         },
     };
 
-    const fetchPrivacyData = async () => {
+    const fetchAboutData = async () => {
         try {
-            const res = await axios.get("/rule/privacy-policy");
+            const res = await axios.get("/rule/about");
             if (res.data?.data?.content) {
                 setContent(res.data.data.content);
             }
@@ -30,28 +30,28 @@ const Privacy = () => {
     };
 
     useEffect(() => {
-        fetchPrivacyData();
+        fetchAboutData();
     }, []);
 
-    const savePrivacyData = async () => {
+    const saveAboutData = async () => {
         try {
             setLoading(true);
 
             const payload = {
-                type: "privacy",
+                type: "about",
                 content: content,
             };
 
-            const res = await axios.patch("/rule/privacy-policy", payload);
+            const res = await axios.patch("/rule/about", payload);
 
             if (res.data.success) {
-                message.success("Privacy Policy updated successfully!");
+                message.success("About updated successfully!");
             } else {
                 message.error("Failed to update");
             }
         } catch (error) {
             console.error(error);
-            message.error("Error updating privacy policy");
+            message.error("Error updating about information");
         } finally {
             setLoading(false);
         }
@@ -60,7 +60,7 @@ const Privacy = () => {
     return (
         <div className="bg-white px-4 py-2 rounded-lg pb-10">
             <div className="flex items-center justify-between my-4">
-                <h3 className="text-3xl text-primary font-semibold">Privacy Policy</h3>
+                <h3 className="text-3xl text-primary font-semibold">About</h3>
             </div>
 
             {/* Editor */}
@@ -77,7 +77,7 @@ const Privacy = () => {
                     type="primary"
                     loading={loading}
                     style={{ height: 40, width: "150px" }}
-                    onClick={savePrivacyData}
+                    onClick={saveAboutData}
                 >
                     Save Changes
                 </Button>
@@ -86,4 +86,4 @@ const Privacy = () => {
     );
 };
 
-export default Privacy;
+export default About;

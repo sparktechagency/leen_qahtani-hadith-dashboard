@@ -3,7 +3,9 @@ import { Link } from 'react-router-dom';
 
 const { Header } = Layout;
 
-const HeaderDashboard = () => {
+
+
+const HeaderDashboard = ({ user }: any) => {
     return (
         <Header
             style={{
@@ -65,15 +67,19 @@ const HeaderDashboard = () => {
                         }}
                     >
                         <img
-                            src={'/user.png'}
-                            style={{
-                                width: '44px',
-                                height: '44px',
-                                borderRadius: '50%',
-                                borderColor: '#DBB162',
-                                borderWidth: 2,
-                            }}
-                            alt=""
+                        src={
+                            user?.profile
+                            ? `${import.meta.env.VITE_API_URL_IMAGE}${user.profile}`
+                            : '/user.png'
+                        }
+                        style={{
+                            width: '44px',
+                            height: '44px',
+                            borderRadius: '50%',
+                            borderColor: '#DBB162',
+                            borderWidth: 2,
+                        }}
+                        alt="profile"
                         />
                         <h2
                             style={{
@@ -82,7 +88,7 @@ const HeaderDashboard = () => {
                                 fontWeight: '600',
                             }}
                         >
-                            Anonymous
+                            {user?.name}
                         </h2>
                     </Link>
                 </div>
