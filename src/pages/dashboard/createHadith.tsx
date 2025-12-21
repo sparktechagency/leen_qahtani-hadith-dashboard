@@ -149,7 +149,7 @@ const HadithManagement: React.FC = () => {
       let res: AxiosResponse<any, any, {}>;
       if (editData) {
         // Update existing hadith
-        res = await axiosInstance.put(`/hadith/${editData._id}`, formData, {
+        res = await axiosInstance.patch(`/hadith/${editData._id}`, formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
         message.success("Hadith updated successfully");
