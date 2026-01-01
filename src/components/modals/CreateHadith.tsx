@@ -19,7 +19,7 @@ type HadithFormValues = {
 const CreateHadithPage = ({ allCategories }: { allCategories: Category[] }) => {
   const [form] = Form.useForm();
   const [description, setDescription] = useState<string>("");
-  const [hadith, setHadith] = useState<string>("");
+  const [, setHadith] = useState<string>("");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
 
