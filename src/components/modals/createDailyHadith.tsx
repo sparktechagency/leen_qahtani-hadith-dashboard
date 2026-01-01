@@ -10,6 +10,8 @@ type HadithFormValues = {
   title: string;
   category: string;
   refrence?: string;
+  hadith: string;
+  description: string;
   icon?: string;
   daily: boolean;
 };
@@ -32,6 +34,7 @@ const handleSubmit = async (values: HadithFormValues) => {
 
     formData.append("title", values.title);
     formData.append("category", values.category);
+    formData.append("hadith", values.hadith);
     formData.append("description", description);
     formData.append("daily", "true");
     if (values.refrence) formData.append("refrence", values.refrence);
@@ -88,6 +91,13 @@ const handleSubmit = async (values: HadithFormValues) => {
     <Switch defaultChecked disabled />
     
   </Form.Item> */}
+  <Form.Item
+    label="Hadith Text"
+    name="hadith"
+    rules={[{ required: true, message: "Hadith text is required" }]}
+  >
+    <Input.TextArea rows={4} placeholder="Enter the hadith text" />
+  </Form.Item>
 
   <Form.Item label="Description">
     <ReactQuill value={description} onChange={setDescription} />

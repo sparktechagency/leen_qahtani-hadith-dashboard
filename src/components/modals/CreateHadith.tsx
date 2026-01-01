@@ -11,12 +11,15 @@ type HadithFormValues = {
   title: string;
   category: string;
   refrence?: string;
+  hadith: string;
+  description: string;
   daily: boolean;
 };
 
 const CreateHadithPage = ({ allCategories }: { allCategories: Category[] }) => {
   const [form] = Form.useForm();
   const [description, setDescription] = useState<string>("");
+  const [hadith, setHadith] = useState<string>("");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
 
@@ -33,6 +36,7 @@ const handleSubmit = async (values: HadithFormValues) => {
 
     formData.append("title", values.title);
     formData.append("category", values.category); 
+    formData.append("hadith", values.hadith);
     formData.append("description", description);
 
     if (values.refrence) formData.append("refrence", values.refrence);
@@ -47,6 +51,7 @@ const handleSubmit = async (values: HadithFormValues) => {
     message.success("Hadith created successfully");
     form.resetFields();
     setDescription("");
+    setHadith("");
     setImageFile(null);
     setImageUrl(null);
   } catch (err: any) {
@@ -85,6 +90,14 @@ const handleSubmit = async (values: HadithFormValues) => {
 
   <Form.Item label="Daily" name="daily" valuePropName="checked">
     <Switch />
+  </Form.Item>
+
+  <Form.Item
+    label="hadith"
+    name="hadith"
+    rules={[{ required: true, message: "Hadith text is required" }]}
+  >
+    <Input.TextArea rows={4} placeholder="Enter the hadith text" />
   </Form.Item>
 
   <Form.Item label="Description">

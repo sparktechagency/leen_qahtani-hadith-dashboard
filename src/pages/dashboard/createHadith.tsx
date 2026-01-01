@@ -31,6 +31,7 @@ type HadithData = {
   title: string;
   refrence?: string;
   category?: any;
+  hadith: string;
   description: string;
   icon?: string;
   status?: boolean;
@@ -51,6 +52,7 @@ const HadithManagement: React.FC = () => {
   const [viewData, setViewData] = useState<HadithData | null>(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [editData, setEditData] = useState<HadithData | null>(null);
+  const [hadith, setHadith] = useState("");
   const [description, setDescription] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [, setImageUrl] = useState<string | null>(null);
@@ -139,6 +141,7 @@ const HadithManagement: React.FC = () => {
       // Required fields
       formData.append("title", values.title);
       formData.append("category", values.category);
+      formData.append("hadith", hadith);
       formData.append("description", description);
 
       // Optional fields
@@ -173,6 +176,7 @@ const HadithManagement: React.FC = () => {
       setIsModalOpen(false);
       setEditData(null);
       form.resetFields();
+      setHadith("");
       setDescription("");
       setImageFile(null);
       setImageUrl(null);
@@ -190,7 +194,7 @@ const HadithManagement: React.FC = () => {
       width: 80,
       render: (_: any, __: any, index: number) => index + 1,
     },
-    { title: "Hadith", dataIndex: "title", key: "title" },
+    { title: "Title", dataIndex: "title", key: "title" },
     {
       title: "Categories",
       key: "category",
@@ -198,6 +202,20 @@ const HadithManagement: React.FC = () => {
         typeof record.category === "object" ? record.category?.name : record.category || "-",
     },
     { title: "Reference", dataIndex: "refrence", key: "refrence" },
+
+    {
+      title: "Hadith",
+      key: "hadith",
+      render: (record: HadithData) => (
+        <div
+          style={{ maxWidth: 300, whiteSpace: "pre-wrap", overflow: "hidden", textOverflow: "ellipsis" }}
+          className="text-gray-700"
+        >
+          {record.hadith}
+        </div>
+      ),  
+    },
+
     {
       title: "Description",
       key: "desc",
@@ -249,6 +267,7 @@ const HadithManagement: React.FC = () => {
                 title: record.title,
                 refrence: record.refrence,
                 category: typeof record.category === "object" ? record.category?._id : record.category,
+                hadith: record.hadith,
                 daily: record.daily || false,
               });
               setDescription(record.description || "");
@@ -335,6 +354,7 @@ const HadithManagement: React.FC = () => {
           onClick={() => {
             setEditData(null);
             form.resetFields();
+            setHadith("");
             setDescription("");
             setImageFile(null);
             setImageUrl(null);
@@ -372,6 +392,7 @@ const HadithManagement: React.FC = () => {
             {viewData.icon && (
               <img src={getImageUrl(viewData.icon)} alt="icon" className="w-32 h-32 object-cover rounded" />
             )}
+            <p><strong>Hadith:</strong> {viewData.hadith}</p>
             <div dangerouslySetInnerHTML={{ __html: viewData.description }} />
           </div>
         )}
@@ -386,6 +407,7 @@ const HadithManagement: React.FC = () => {
           setIsModalOpen(false);
           setEditData(null);
           form.resetFields();
+          setHadith("");
           setDescription("");
           setImageFile(null);
           setImageUrl(null);
@@ -399,7 +421,7 @@ const HadithManagement: React.FC = () => {
           initialValues={{ daily: false }}
         >
           <Form.Item 
-            label="Hadith Title" 
+            label="Title" 
             name="title" 
             rules={[{ required: true, message: "Title is required" }]}
           >
@@ -425,6 +447,18 @@ const HadithManagement: React.FC = () => {
           <Form.Item label="Daily" name="daily" valuePropName="checked">
             <Switch />
           </Form.Item> */}
+          <Form.Item
+            label="Hadith"
+            name="hadith"
+            rules={[{ required: true, message: "Hadith text is required" }]}
+          >
+            <Input.TextArea 
+              rows={4} 
+              placeholder="Enter the hadith text" 
+              value={hadith}
+              onChange={(e) => setHadith(e.target.value)}
+            />
+          </Form.Item>
 
           <Form.Item label="Description">
             <ReactQuill 

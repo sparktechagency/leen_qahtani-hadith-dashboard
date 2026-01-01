@@ -33,6 +33,7 @@ type HadithData = {
   title: string;
   refrence?: string;
   category?: any;
+  hadith: string;
   description: string;
   icon?: string;
   status?: boolean;
@@ -54,6 +55,7 @@ const DailyAllHadith: React.FC = () => {
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [editData, setEditData] = useState<HadithData | null>(null);
   const [description, setDescription] = useState("");
+  const [hadith, setHadith] = useState("");
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [form] = Form.useForm();
@@ -141,6 +143,7 @@ const DailyAllHadith: React.FC = () => {
       // Required fields
       formData.append("title", values.title);
       formData.append("category", values.category);
+      formData.append("hadith", values.hadith);
       formData.append("description", description);
 
       // Optional fields
@@ -175,6 +178,7 @@ const DailyAllHadith: React.FC = () => {
       setIsModalOpen(false);
       setEditData(null);
       form.resetFields();
+      setHadith("");
       setDescription("");
       setImageFile(null);
       setImageUrl(null);
@@ -192,7 +196,7 @@ const DailyAllHadith: React.FC = () => {
       width: 80,
       render: (_: any, __: any, index: number) => index + 1,
     },
-    { title: "Hadith", dataIndex: "title", key: "title" },
+    { title: "title", dataIndex: "title", key: "title" },
     {
       title: "Categories",
       key: "category",
@@ -213,6 +217,18 @@ const DailyAllHadith: React.FC = () => {
     ) : (
       "—"
     ),
+},
+{
+  title: "Hadith",
+  key: "hadith",
+  render: (record: HadithData) => (
+    <div
+      style={{ maxWidth: 300, whiteSpace: "pre-wrap", overflow: "hidden", textOverflow: "ellipsis" }}
+      className="text-gray-700"
+    >
+      {record.hadith}
+    </div>
+  ),  
 },
 
     {
@@ -266,6 +282,7 @@ const DailyAllHadith: React.FC = () => {
                 title: record.title,
                 refrence: record.refrence,
                 category: typeof record.category === "object" ? record.category?._id : record.category,
+                hadith: record.hadith,
                 icon: record.icon,
                 daily: record.daily || true,
               });
@@ -387,6 +404,8 @@ const DailyAllHadith: React.FC = () => {
             <h3 className="text-xl font-bold">{viewData.title}</h3>
             <p><strong>Reference:</strong> {viewData.refrence}</p>
             <p><strong>Category:</strong> {typeof viewData.category === "object" ? viewData.category?.name : viewData.category}</p>
+            <p><strong>Description:</strong></p>
+            <p><strong>Hadith:</strong> {viewData.hadith}</p>
             {/* <p><strong>Daily:</strong> {viewData.daily ? "Yes" : "No"}</p> */}
             {viewData.icon && (
               <img src={getImageUrl(viewData.icon)} alt="icon" className="w-32 h-32 object-cover rounded" />
@@ -418,7 +437,7 @@ const DailyAllHadith: React.FC = () => {
           initialValues={{ daily: true }}
         >
           <Form.Item 
-            label="Hadith Title" 
+            label="Title" 
             name="title" 
             rules={[{ required: true, message: "Title is required" }]}
           >
@@ -444,6 +463,18 @@ const DailyAllHadith: React.FC = () => {
           <Form.Item label="Daily" name="daily" valuePropName="checked">
             <Switch />
           </Form.Item> */}
+          <Form.Item
+            label="Hadith"
+            name="hadith"
+            rules={[{ required: true, message: "Hadith text is required" }]}
+          >
+            <Input.TextArea 
+              rows={4} 
+              placeholder="Enter the hadith text" 
+              value={hadith}
+              onChange={(e) => setHadith(e.target.value)}
+            />
+          </Form.Item>
 
           <Form.Item label="Description">
             <ReactQuill 
