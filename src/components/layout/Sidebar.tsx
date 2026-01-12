@@ -61,7 +61,7 @@ const Sidebar = () => {
       <Sider width={250} theme="light">
         <Link to="/">
           <div className="flex items-center justify-center py-5">
-            <img src="/logo.png" className="w-[100px] h-[100px]" />
+            <img src="/logo.png" className="w-fit object-contain h-[100px]" />
           </div>
         </Link>
 

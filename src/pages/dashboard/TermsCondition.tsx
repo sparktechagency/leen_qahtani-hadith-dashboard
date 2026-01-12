@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import JoditEditor from 'jodit-react';
 import { Button, message } from 'antd';
 import axios from "../../utils/axiosInstance";
@@ -8,14 +8,30 @@ const TermsCondition = () => {
     const [content, setContent] = useState('');
     const [loading, setLoading] = useState(false);
 
-    const config = {
+    // FIX: Cast config to 'any' to avoid strict TypeScript errors with Jodit types
+    const config = useMemo(() => ({
         readonly: false,
-        placeholder: 'Start typings...',
+        placeholder: 'ابدأ الكتابة هنا...',
+        direction: "rtl",
+        language: "ar",
         style: {
             height: 400,
             background: 'white',
+            textAlign: 'right',
+            direction: 'rtl',
+            fontFamily: "'Traditional Arabic', 'Amiri', serif",
+            fontSize: "18px"
         },
-    };
+        toolbarButtonSize: "middle",
+        buttons: [
+            'bold', 'italic', 'underline', '|', 
+            'ul', 'ol', '|', 
+            'font', 'fontsize', '|', 
+            'align', 'undo', 'redo', '|',
+            'hr', 'link'
+        ]
+    }), []) as any;
+
     const fetchTermsData = async () => {
         try {
             const res = await axios.get("/rule/terms-and-conditions");
@@ -24,14 +40,15 @@ const TermsCondition = () => {
             }
         } catch (error) {
             console.error(error);
-            message.error("Failed to load terms and conditions");
+            message.error("فشل تحميل الشروط والأحكام");
         }
     };
 
     useEffect(() => {
         fetchTermsData();
     }, []);
-const saveTermsData = async () => {
+
+    const saveTermsData = async () => {
         try {
             setLoading(true);
 
@@ -42,90 +59,50 @@ const saveTermsData = async () => {
 
             const res = await axios.patch("/rule/terms-and-conditions", payload);
             if (res.data.success) {
-                message.success("Terms and Conditions updated successfully!");
+                message.success("تم تحديث الشروط والأحكام بنجاح");
             } else {
-                message.error("Failed to update");
+                message.error("فشل التحديث");
             }
         } catch (error) {
             console.error(error);
-            message.error("Error updating terms and conditions");
+            message.error("حدث خطأ أثناء تحديث الشروط والأحكام");
         } finally {
             setLoading(false);
         }
     };
 
-    // return (
-    //     <div className=" bg-white px-4 py-2 rounded-lg pb-10 ">
-    //         <div
-    //             style={{
-    //                 display: 'flex',
-    //                 alignItems: 'center',
-    //                 justifyContent: 'space-between',
-    //                 margin: '16px 0',
-    //             }}
-    //         >
-    //             <div>
-    //                 <h3 className="text-2xl text-primary font-semibold">Terms and Conditions</h3>
-    //             </div>
-    //         </div>
-    //         <div>
-    //             <JoditEditor
-    //                 ref={editor}
-    //                 value={content}
-    //                 config={config}
-    //                 onBlur={(newContent) => setContent(newContent)}
-    //             />
-    //         </div>
-    //         <div
-    //             style={{
-    //                 marginTop: 24,
-    //                 display: 'flex',
-    //                 justifyContent: 'center',
-    //                 alignItems: 'center',
-    //             }}
-    //         >
-    //             <Button
-    //                 style={{
-    //                     height: 40,
-    //                     width: '150px',
-    //                 }}
-    //                 onClick={saveTermsData}
-    //                 type="primary"
-    //             >
-    //                 Save Changes
-    //             </Button>
-    //         </div>
-    //     </div>
-    // );
-
     return (
-        <div className="bg-white px-4 py-2 rounded-lg pb-10">
+        <div className="bg-white px-4 py-2 rounded-lg pb-10" dir="rtl">
+            {/* Header */}
             <div className="flex items-center justify-between my-4">
-                <h3 className="text-3xl text-primary font-semibold">Terms and Conditions</h3>
+                <h3 className="text-3xl text-primary font-semibold">الشروط والأحكام</h3>
             </div>
 
             {/* Editor */}
-            <JoditEditor
-                ref={editor}
-                value={content}
-                config={config}
-                onBlur={(newContent) => setContent(newContent)}
-            />
+            {/* Wrapper with ltr direction ensures the toolbar icons render correctly, 
+                while the internal text area respects the config's RTL setting */}
+            <div className="jodit-container" style={{ direction: "ltr" }}>
+                <JoditEditor
+                    ref={editor}
+                    value={content}
+                    config={config}
+                    onBlur={(newContent) => setContent(newContent)}
+                />
+            </div>
 
             {/* Save Button */}
             <div className="mt-6 flex justify-center">
                 <Button
                     type="primary"
                     loading={loading}
-                    style={{ height: 40, width: "150px" }}
+                    style={{ height: 40, width: "150px", background: "#2e7d32", border: "none" }}
                     onClick={saveTermsData}
                 >
-                    Save Changes
+                    حفظ التغييرات
                 </Button>
             </div>
         </div>
     );
-
 };
 
 export default TermsCondition;

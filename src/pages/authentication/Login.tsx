@@ -7,41 +7,44 @@ const Login = () => {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
 
-interface LoginFormValues {
-    email: string;
-    password: string;
-    remember?: boolean;
-}
-
-const onFinish: FormProps<LoginFormValues>['onFinish'] = async (values) => {
-    try {
-        setLoading(true);
-
-        const response = await axiosInstance.post('/auth/email-login', {
-            email: values.email,
-            password: values.password,
-        });
-
-        message.success("Login successful!");
-
-        if (response.data?.data?.accessToken) {
-            localStorage.setItem("authToken", response.data.data.accessToken);
-        }
-
-        navigate('/');
-
-    } catch (error: any) {
-        message.error(error?.response?.data?.message || "Login failed!");
-    } finally {
-        setLoading(false);
+    interface LoginFormValues {
+        email: string;
+        password: string;
+        remember?: boolean;
     }
-};
+
+    const onFinish: FormProps<LoginFormValues>['onFinish'] = async (values) => {
+        try {
+            setLoading(true);
+
+            const response = await axiosInstance.post('/auth/email-login', {
+                email: values.email,
+                password: values.password,
+            });
+
+            message.success("تم تسجيل الدخول بنجاح!");
+
+            if (response.data?.data?.accessToken) {
+                localStorage.setItem("authToken", response.data.data.accessToken);
+            }
+
+            navigate('/');
+
+        } catch (error: any) {
+            message.error(error?.response?.data?.message || "فشل تسجيل الدخول!");
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <ConfigProvider
+            direction="rtl"
             theme={{
                 token: {
                     colorPrimary: '#286a25',
                     colorBgContainer: '#F1F4F9',
+                    fontFamily: "'Cairo', 'Montserrat', sans-serif", // Ensure Arabic font
                 },
                 components: {
                     Input: {
@@ -56,6 +59,7 @@ const onFinish: FormProps<LoginFormValues>['onFinish'] = async (values) => {
             }}
         >
             <div
+                dir="rtl"
                 className="flex items-center justify-center h-screen"
                 style={{
                     backgroundImage: `url('/auth.png')`,
@@ -65,10 +69,10 @@ const onFinish: FormProps<LoginFormValues>['onFinish'] = async (values) => {
                     objectFit: 'cover',
                 }}
             >
-                <div className="bg-white w-[630px] rounded-lg shadow-lg p-10 ">
-                    <div className="text-primaryText space-y-3 text-center">
-                        <h1 className="text-3xl font-medium text-center mt-2">Login to Account</h1>
-                        <p className="text-lg">Please enter your email and password to continue</p>
+                <div className="bg-white w-[630px] rounded-lg shadow-lg p-10">
+                    <div className="text-primaryText space-y-3 text-center mb-6">
+                        <h1 className="text-3xl font-bold text-center mt-2 text-[#286a25]">تسجيل الدخول</h1>
+                        <p className="text-lg text-gray-500">يرجى إدخال البريد الإلكتروني وكلمة المرور للمتابعة</p>
                     </div>
 
                     <Form
@@ -79,27 +83,35 @@ const onFinish: FormProps<LoginFormValues>['onFinish'] = async (values) => {
                         onFinish={onFinish}
                     >
                         <Form.Item
-                            label={<label className="text-primaryText mb-1 text-lg">Email</label>}
+                            label={<label className="text-primaryText mb-1 text-lg font-medium">البريد الإلكتروني</label>}
                             name="email"
-                            rules={[{ required: true, message: 'Please input your email!' }]}
+                            rules={[{ required: true, message: 'يرجى إدخال البريد الإلكتروني!' }]}
                         >
-                            <Input placeholder="Enter your email address" type="email" className="h-12 px-6" />
+                            <Input 
+                                placeholder="أدخل البريد الإلكتروني" 
+                                type="email" 
+                                className="h-12 px-4 bg-[#F1F4F9]" 
+                            />
                         </Form.Item>
 
                         <Form.Item
-                            label={<label className="text-primaryText mb-1 text-lg">Password</label>}
+                            label={<label className="text-primaryText mb-1 text-lg font-medium">كلمة المرور</label>}
                             name="password"
-                            rules={[{ required: true, message: 'Please input your password!' }]}
+                            rules={[{ required: true, message: 'يرجى إدخال كلمة المرور!' }]}
                         >
-                            <Input.Password placeholder="Enter your password" className="h-12 px-6" />
+                            <Input.Password 
+                                placeholder="أدخل كلمة المرور" 
+                                className="h-12 px-4 bg-[#F1F4F9]" 
+                            />
                         </Form.Item>
 
-                        <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center justify-between mb-6 mt-2">
                             <Form.Item name="remember" valuePropName="checked" noStyle>
-                                <Checkbox className="text-primaryText text-lg">Remember me</Checkbox>
+                                <Checkbox className="text-primaryText text-base">تذكرني</Checkbox>
                             </Form.Item>
-                            <Link to="/forget-password" className="text-primary text-md hover:text-primary">
-                                Forget password
+                            
+                            <Link to="/forget-password" className="text-[#286a25] text-base hover:text-[#1e501c] font-medium">
+                                نسيت كلمة المرور؟
                             </Link>
                         </div>
 
@@ -110,12 +122,15 @@ const onFinish: FormProps<LoginFormValues>['onFinish'] = async (values) => {
                                 htmlType="submit"
                                 loading={loading}
                                 style={{
-                                    height: 45,
+                                    height: 50,
                                     width: '100%',
-                                    fontWeight: 500,
+                                    fontWeight: 600,
+                                    fontSize: '18px',
+                                    backgroundColor: '#286a25',
+                                    border: 'none'
                                 }}
                             >
-                                Sign In
+                                دخول
                             </Button>
                         </Form.Item>
                     </Form>
@@ -126,112 +141,3 @@ const onFinish: FormProps<LoginFormValues>['onFinish'] = async (values) => {
 };
 
 export default Login;
-
-
-// import { Button, Checkbox, ConfigProvider, Form, FormProps, Input } from 'antd';
-// import { FieldNamesType } from 'antd/es/cascader';
-// import { Link, useNavigate } from 'react-router-dom';
-
-// const Login = () => {
-//     const navigate = useNavigate();
-//     const onFinish: FormProps<FieldNamesType>['onFinish'] = (values) => {
-//         console.log('Received values of form: ', values);
-//         navigate('/');
-//     };
-
-//     return (
-//         <ConfigProvider
-//             theme={{
-//                 token: {
-//                     colorPrimary: '#286a25',
-
-//                     colorBgContainer: '#F1F4F9',
-//                 },
-//                 components: {
-//                     Input: {
-//                         borderRadius: 10,
-//                         colorBorder: 'transparent',
-//                         colorPrimaryBorder: 'transparent',
-//                         hoverBorderColor: 'transparent',
-//                         controlOutline: 'none',
-//                         activeBorderColor: 'transparent',
-//                     },
-//                 },
-//             }}
-//         >
-//             <div className="flex items-center justify-center h-screen" style={{
-//             backgroundImage: `url('/auth.png')`,
-//             backgroundSize: 'cover',
-//             backgroundPosition: 'top',
-//             backgroundRepeat: 'no-repeat',
-//             objectFit: 'cover',
-//         }}>
-//                 <div className="bg-white w-[630px] rounded-lg shadow-lg p-10 ">
-//                     <div className="text-primaryText space-y-3 text-center">
-//                         <h1 className="text-3xl  font-medium text-center mt-2">Login to Account</h1>
-//                         <p className="text-lg">Please enter your email and password to continue</p>
-//                     </div>
-
-//                     <Form
-//                         name="normal_login"
-//                         className="login-form"
-//                         layout="vertical"
-//                         initialValues={{ remember: true }}
-//                         onFinish={onFinish}
-//                     >
-//                         <Form.Item
-//                             label={
-//                                 <label htmlFor="email" className="block text-primaryText mb-1 text-lg">
-//                                     Email
-//                                 </label>
-//                             }
-//                             name="email"
-//                             rules={[{ required: true, message: 'Please input your email!' }]}
-//                         >
-//                             <Input placeholder="Enter your email address" type="email" className=" h-12  px-6 " />
-//                         </Form.Item>
-
-//                         <Form.Item
-//                             label={
-//                                 <label htmlFor="password" className="block text-primaryText mb-1 text-lg">
-//                                     Password
-//                                 </label>
-//                             }
-//                             name="password"
-//                             rules={[{ required: true, message: 'Please input your Password!' }]}
-//                         >
-//                             <Input.Password placeholder="Enter your password" className=" h-12  px-6" />
-//                         </Form.Item>
-
-//                         <div className="flex items-center justify-between mb-4">
-//                             <Form.Item name="remember" valuePropName="checked" noStyle>
-//                                 <Checkbox className="text-primaryText text-lg">Remember me</Checkbox>
-//                             </Form.Item>
-//                             <Link to="/forget-password" className="text-primary text-md hover:text-primary">
-//                                 Forget password
-//                             </Link>
-//                         </div>
-
-//                         <Form.Item>
-//                             <Button
-//                                 shape="round"
-//                                 type="primary"
-//                                 htmlType="submit"
-//                                 style={{
-//                                     height: 45,
-//                                     width: '100%',
-//                                     fontWeight: 500,
-//                                 }}
-//                                 // onClick={() => navigate('/')}
-//                             >
-//                                 Sign In
-//                             </Button>
-//                         </Form.Item>
-//                     </Form>
-//                 </div>
-//             </div>
-//         </ConfigProvider>
-//     );
-// };
-
-// export default Login;

@@ -53,7 +53,7 @@ const AddcategorysModal = ({
             });
         }
 
-toast.success(editData ? "Category updated successfully!" : "Category created successfully!");
+toast.success(editData ? "تم تحديث الفئة بنجاح!" : "تم إنشاء الفئة بنجاح!");
         onSuccess();
         setIsOpen(false);
         form.resetFields();
@@ -85,18 +85,18 @@ toast.success(editData ? "Category updated successfully!" : "Category created su
                 
                 {/* Name */}
                 <Form.Item
-                    label={<span className="text-[15px] font-medium">Name</span>}
+                    label={<span className="text-[15px] font-medium">الاسم</span>}
                     name="name"
-                    rules={[{ required: true, message: "Enter category name" }]}
+                    rules={[{ required: true, message: "أدخل اسم الفئة" }]}
                 >
                     <Input
-                        placeholder="enter categories name"
+                        placeholder="أدخل اسم الفئة"
                         className="h-11 rounded-lg border-gray-300"
                     />
                 </Form.Item>
 
                 {/* Icon */}
-                <p className="text-[15px] font-medium mb-1">Icon</p>
+                <p className="text-[15px] font-medium mb-1">صورة الفئة</p>
 
                 <label
                     htmlFor="image"
@@ -111,7 +111,7 @@ toast.success(editData ? "Category updated successfully!" : "Category created su
                     ) : (
                         <>
                             <PiImageThin className="text-4xl text-gray-500 mb-2" />
-                            <p className="text-gray-600 font-medium">upload category image or icon</p>
+                            <p className="text-gray-600 font-medium">تحميل صورة أو أيقونة الفئة</p>
                             <p className="text-xs text-gray-500">PNG, JPG</p>
                         </>
                     )}

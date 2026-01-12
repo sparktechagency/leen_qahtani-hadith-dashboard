@@ -156,47 +156,6 @@ const VerifyOtp = () => {
                             <p className="text-primary cursor-pointer" onClick={resendOtp}>Resend code</p>
                         </div>
                     </Form>
-                    {/* <Form
-                        name="verifyOtp"
-                        className="my-5"
-                        layout="vertical"
-                        onFinish={onFinish}
-                    >
-                        <Form.Item
-                            className="flex items-center justify-center mx-auto"
-                            name="otp"
-                            rules={[{ required: true, message: 'Please input otp code here!' }]}
-                        >
-                            <Input.OTP
-                                style={{
-                                    width: 300,
-                                }}
-                                className=""
-                                variant="filled"
-                                length={5}
-                            />
-                        </Form.Item>
-
-                        <Form.Item>
-                            <Button
-                                shape="round"
-                                type="primary"
-                                htmlType="submit"
-                                style={{
-                                    height: 45,
-                                    width: '100%',
-                                    fontWeight: 500,
-                                }}
-                                // onClick={() => navigate('/')}
-                            >
-                                Verify OTP Code
-                            </Button>
-                        </Form.Item>
-                        <div className="text-center text-lg flex items-center justify-center gap-2">
-                            <p className="text-primaryText">Didn't receive the code?</p>
-                            <p className="text-primary">Resend code</p>
-                        </div>
-                    </Form> */}
                 </div>
             </div>
         </ConfigProvider>
