@@ -28,6 +28,14 @@ import { AxiosResponse } from "axios";
 const { Option } = Select;
 const { Search } = Input;
 
+// Shared style for Arabic text inputs
+const arabicTextStyle = {
+  direction: "rtl" as const,
+  textAlign: "right" as const,
+  fontFamily: "'Traditional Arabic', 'Amiri', serif",
+  fontSize: "16px",
+};
+
 type HadithData = {
   _id: string;
   title: string;
@@ -68,9 +76,6 @@ const DailyAllHadith: React.FC = () => {
           axiosInstance.get("/hadith/by-daily?daily=true", { headers: { "Cache-Control": "no-cache" } }), 
           axiosInstance.get("/category", { headers: { "Cache-Control": "no-cache" } }),
         ]);
-
-        console.log("Hadith:", hadithRes.data.data);
-        console.log("Categories:", catRes.data.data);
 
         setHadithList(hadithRes.data.data || []);
         setCategories(catRes.data.data || []);
@@ -114,9 +119,9 @@ const DailyAllHadith: React.FC = () => {
       setHadithList(prev =>
         prev.map(h => (h._id === id ? { ...h, status: !current } : h))
       );
-      message.success("Status updated");
+      message.success("تم تحديث الحالة");
     } catch (err) {
-      message.error("Failed to update status");
+      message.error("فشل تحديث الحالة");
     }
   };
 
@@ -124,9 +129,9 @@ const DailyAllHadith: React.FC = () => {
     try {
       await axiosInstance.delete(`/hadith/${id}`);
       setHadithList(prev => prev.filter(h => h._id !== id));
-      message.success("Hadith deleted");
+      message.success("تم حذف الحديث");
     } catch (err) {
-      message.error("Failed to delete");
+      message.error("فشل الحذف");
     }
   };
 
@@ -140,41 +145,34 @@ const DailyAllHadith: React.FC = () => {
     try {
       const formData = new FormData();
 
-      // Required fields
       formData.append("title", values.title);
       formData.append("category", values.category);
       formData.append("hadith", values.hadith);
       formData.append("description", description);
 
-      // Optional fields
       if (values.refrence) formData.append("refrence", values.refrence);
       formData.append("daily", String(values.daily || true));
       if (imageFile) formData.append("icon", imageFile);
 
       let res: AxiosResponse<any, any, {}>;
       if (editData) {
-        // Update existing hadith
         res = await axiosInstance.patch(`/hadith/${editData._id}`, formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
-        message.success("Hadith updated successfully");
+        message.success("تم تحديث الحديث بنجاح");
         
-        // Update the list
         setHadithList(prev =>
           prev.map(h => (h._id === editData._id ? res.data.data : h))
         );
       } else {
-        // Create new hadith
         res = await axiosInstance.post("/hadith", formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
-        message.success("Hadith created successfully");
+        message.success("تم إنشاء الحديث بنجاح");
         
-        // Add to the list
         setHadithList(prev => [...prev, res.data.data]);
       }
 
-      // Close modal and reset form
       setIsModalOpen(false);
       setEditData(null);
       form.resetFields();
@@ -185,55 +183,62 @@ const DailyAllHadith: React.FC = () => {
 
     } catch (err: any) {
       console.error("Hadith save error:", err.response?.data || err);
-      message.error(err.response?.data?.message || "Failed to save Hadith");
+      message.error(err.response?.data?.message || "فشل حفظ الحديث");
     }
   };
 
   const columns = [
     {
-      title: "Serial No",
+      title: "ر.ت.",
       key: "index",
       width: 80,
-      render: (_: any, __: any, index: number) => index + 1,
+      render: (_: any, __: any, index: number) => {
+        const arabicNumbers = ["٠", "١", "٢", "٣", "٤", "٥", "٦", "٧", "٨", "٩"];
+        return (index + 1)
+          .toString()
+          .replace(/\d/g, (d) => arabicNumbers[parseInt(d)]);
+      },
     },
-    { title: "title", dataIndex: "title", key: "title" },
+    { title: "العنوان", dataIndex: "title", key: "title", align: "right" as const },
     {
-      title: "Categories",
+      title: "الفئة",
       key: "category",
+      align: "right" as const,
       render: (record: HadithData) =>
         typeof record.category === "object" ? record.category?.name : record.category || "-",
     },
-    { title: "Reference", dataIndex: "refrence", key: "refrence" },
-   
+    { title: "المرجع", dataIndex: "refrence", key: "refrence", align: "right" as const },
     {
-  title: "Image",
-  key: "icon",
-  render: (record: { icon: string | undefined; }) =>
-    record.icon ? (
-      <img
-        src={getImageUrl(record.icon)}
-        style={{ width: 50, height: 50, objectFit: "cover", borderRadius: 8 }}
-      />
-    ) : (
-      "—"
-    ),
-},
-{
-  title: "Hadith",
-  key: "hadith",
-  render: (record: HadithData) => (
-    <div
-      style={{ maxWidth: 300, whiteSpace: "pre-wrap", overflow: "hidden", textOverflow: "ellipsis" }}
-      className="text-gray-700"
-    >
-      {record.hadith}
-    </div>
-  ),  
-},
-
+      title: "الصورة",
+      key: "icon",
+      align: "center" as const,
+      render: (record: { icon: string | undefined; }) =>
+        record.icon ? (
+          <img
+            src={getImageUrl(record.icon)}
+            style={{ width: 50, height: 50, objectFit: "cover", borderRadius: 8 }}
+          />
+        ) : (
+          "—"
+        ),
+    },
     {
-      title: "Description",
+      title: "الحديث",
+      key: "hadith",
+      align: "right" as const,
+      render: (record: HadithData) => (
+        <div
+          style={{ maxWidth: 300, whiteSpace: "pre-wrap", overflow: "hidden", textOverflow: "ellipsis" }}
+          className="text-gray-700"
+        >
+          {record.hadith}
+        </div>
+      ),  
+    },
+    {
+      title: "الوصف",
       key: "desc",
+      align: "right" as const,
       render: (record: HadithData) => (
         <div
           dangerouslySetInnerHTML={{ __html: record.description }}
@@ -243,27 +248,28 @@ const DailyAllHadith: React.FC = () => {
       ),
     },
     {
-      title: "Status",
+      title: "الحالة",
       key: "status",
+      align: "center" as const,
       width: 130,
       render: (_: any, record: any) => (
-        <button className="flex items-center gap-2 hover:opacity-80 transition">
+        <button className="flex items-center justify-center gap-2 hover:opacity-80 transition w-full">
           {record.status ? (
-            <span className="text-green-600 font-medium">Active</span>
+          <span className="text-green-600 font-medium">نشط</span>
           ) : (
-            <span className="text-red-600 font-medium">Inactive</span>
+            <span className="text-red-600 font-medium">غير نشط</span>
           )}
         </button>
       ),
     },
     {
-      title: "Action",
+      title: "الإجراء",
       key: "action",
       width: 150,
       fixed: "right" as const,
+      align: "center" as const,
       render: (_: any, record: any) => (
-        <div className="flex items-center gap-3">
-          {/* View */}
+        <div className="flex items-center justify-center gap-3">
           <button
             onClick={() => {
               setViewData(record);
@@ -274,7 +280,6 @@ const DailyAllHadith: React.FC = () => {
             <IoEyeOutline className="text-xl text-primary" />
           </button>
 
-          {/* Edit */}
           <button
             onClick={() => {
               setEditData(record);
@@ -297,7 +302,6 @@ const DailyAllHadith: React.FC = () => {
             <IoPencil className="text-xl text-primary" />
           </button>
 
-          {/* Toggle Status */}
           <button
             onClick={() => toggleStatus(record._id, record.status)}
             className="hover:opacity-70"
@@ -309,12 +313,11 @@ const DailyAllHadith: React.FC = () => {
             )}
           </button>
 
-          {/* Delete */}
           <Popconfirm
-            title="Are you sure to delete this Hadith?"
+            title="هل أنت متأكد من حذف هذا الحديث؟"
             onConfirm={() => deleteHadith(record._id)}
-            okText="Yes"
-            cancelText="No"
+            okText="نعم"
+            cancelText="لا"
           >
             <IoTrashOutline className="text-xl text-red-500 cursor-pointer hover:text-red-700" />
           </Popconfirm>
@@ -325,25 +328,49 @@ const DailyAllHadith: React.FC = () => {
 
   return (
     <div style={{ padding: "24px 40px", background: "#fff", minHeight: "100vh" }}>
+      
+      {/* --- Styles for RTL Editor and Form --- */}
+      <style>{`
+        .arabic-quill .ql-editor {
+          direction: rtl;
+          text-align: right;
+          font-family: 'Traditional Arabic', 'Amiri', serif;
+          font-size: 18px;
+        }
+        .arabic-quill .ql-editor.ql-blank::before {
+          right: 15px;
+          left: auto;
+          text-align: right;
+        }
+        .ant-modal-title {
+          text-align: right;
+        }
+        /* Fix close button position in RTL Modal */
+        .ant-modal-close {
+           right: auto;
+           left: 0;
+        }
+      `}</style>
+
       {/* Top Header */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
-        <h1 style={{ fontSize: 24, fontWeight: "bold", margin: 0 }}>Hadith</h1>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24, direction: 'rtl' }}>
+        <h1 style={{ fontSize: 24, fontWeight: "bold", margin: 0 }}>الأحاديث اليومية</h1>
       </div>
 
       {/* Filters + Add Button */}
       <div style={{ display: "flex", justifyContent: "flex-end", gap: 12, marginBottom: 16 }}>
         <Space>
           <Search
-            placeholder="Search"
+            placeholder="بحث"
             allowClear
             onChange={(e) => setSearchText(e.target.value)}
-            style={{ width: 250 }}
+            style={{ width: 250, direction: 'rtl' }}
           />
         </Space>
         <Select
-          placeholder="Categories"
+          placeholder="الفئات"
           allowClear
-          style={{ width: 180 }}
+          style={{ width: 180, direction: 'rtl' }}
           onChange={(v) => setFilterCategory(v || undefined)}
         >
           {categories.map((cat) => (
@@ -352,10 +379,10 @@ const DailyAllHadith: React.FC = () => {
         </Select>
 
         <Select
-          placeholder="Reference"
+          placeholder="المرجع"
           allowClear
           showSearch
-          style={{ width: 200 }}
+          style={{ width: 200, direction: 'rtl' }}
           onChange={(v) => setFilterReference(v || undefined)}
         >
           {Array.from(new Set(hadithList.map(h => h.refrence).filter(Boolean))).map(ref => (
@@ -367,7 +394,6 @@ const DailyAllHadith: React.FC = () => {
           htmlType="button"
           className="bg-[#82968D]"
           style={{ height: 40 }}
-          // style={{ background: "#2e7d32", border: "none" }}
           onClick={() => {
             setEditData(null);
             form.resetFields();
@@ -377,7 +403,7 @@ const DailyAllHadith: React.FC = () => {
             setIsModalOpen(true);
           }}
         >
-          Add New
+          إضافة جديد
         </Button>
       </div>
 
@@ -389,35 +415,45 @@ const DailyAllHadith: React.FC = () => {
         pagination={{ pageSize: 10 }}
         scroll={{ x: 1300 }}
         bordered={false}
+        // Force table text alignment for RTL columns
+        rowClassName={() => "text-right"} 
       />
 
       {/* View Modal */}
       <Modal
-        title="View Hadith"
+        title={<div style={{ textAlign: "right" }}>عرض الحديث</div>}
         open={isViewModalOpen}
         footer={null}
         onCancel={() => setIsViewModalOpen(false)}
         width={700}
+        style={{ direction: 'rtl' }}
       >
         {viewData && (
-          <div className="space-y-4">
+          <div className="space-y-4" style={{ textAlign: "right", direction: "rtl" }}>
             <h3 className="text-xl font-bold">{viewData.title}</h3>
-            <p><strong>Reference:</strong> {viewData.refrence}</p>
-            <p><strong>Category:</strong> {typeof viewData.category === "object" ? viewData.category?.name : viewData.category}</p>
-            <p><strong>Description:</strong></p>
-            <p><strong>Hadith:</strong> {viewData.hadith}</p>
-            {/* <p><strong>Daily:</strong> {viewData.daily ? "Yes" : "No"}</p> */}
+            <p><strong>المرجع:</strong> {viewData.refrence}</p>
+            <p><strong>الفئة:</strong> {typeof viewData.category === "object" ? viewData.category?.name : viewData.category}</p>
+            <p><strong>الحديث:</strong></p>
+            <div style={{ 
+              background: "#f8f9fa",
+              padding: "15px",
+              borderRadius: "8px",
+              border: "1px solid #e9ecef",
+              ...arabicTextStyle 
+            }}>{viewData.hadith}</div>
+            
             {viewData.icon && (
               <img src={getImageUrl(viewData.icon)} alt="icon" className="w-32 h-32 object-cover rounded" />
             )}
+            <p><strong>الوصف:</strong></p>
             <div dangerouslySetInnerHTML={{ __html: viewData.description }} />
           </div>
         )}
       </Modal>
 
-      {/* Add/Edit Modal */}
+      {/* Add/Edit Modal - FULL RTL IMPLEMENTATION */}
       <Modal
-        title={editData ? "Edit Hadith" : "Add New Hadith"}
+        title={editData ? "تعديل الحديث" : "إضافة حديث جديد"}
         open={isModalOpen}
         footer={null}
         onCancel={() => {
@@ -430,88 +466,92 @@ const DailyAllHadith: React.FC = () => {
         }}
         width={800}
       >
-        <Form 
-          form={form} 
-          layout="vertical" 
-          onFinish={handleSubmit}
-          initialValues={{ daily: true }}
-        >
-          <Form.Item 
-            label="Title" 
-            name="title" 
-            rules={[{ required: true, message: "Title is required" }]}
+        {/* Added dir="rtl" here to force right-to-left flow for labels and inputs */}
+        <div dir="rtl">
+          <Form 
+            form={form} 
+            layout="vertical" 
+            onFinish={handleSubmit}
+            initialValues={{ daily: true }}
           >
-            <Input placeholder="Enter hadith title" />
-          </Form.Item>
-
-          <Form.Item label="Reference" name="refrence">
-            <Input placeholder="Enter reference" />
-          </Form.Item>
-
-          <Form.Item 
-            label="Category" 
-            name="category"
-            rules={[{ required: true, message: "Category is required" }]}
-          >
-            <Select placeholder="Select category">
-              {categories.map(cat => (
-                <Option key={cat._id} value={cat._id}>{cat.name}</Option>
-              ))}
-            </Select>
-          </Form.Item>
-{/* 
-          <Form.Item label="Daily" name="daily" valuePropName="checked">
-            <Switch />
-          </Form.Item> */}
-          <Form.Item
-            label="Hadith"
-            name="hadith"
-            rules={[{ required: true, message: "Hadith text is required" }]}
-          >
-            <Input.TextArea 
-              rows={4} 
-              placeholder="Enter the hadith text" 
-              value={hadith}
-              onChange={(e) => setHadith(e.target.value)}
-            />
-          </Form.Item>
-
-          <Form.Item label="Description">
-            <ReactQuill 
-              value={description} 
-              onChange={setDescription} 
-              style={{ height: 200, marginBottom: 50 }} 
-            />
-          </Form.Item>
-
-         <Form.Item label="Hadith Image (optional)">
-            <Upload
-              accept="image/*"
-              showUploadList={false}
-              beforeUpload={() => false}
-              onChange={handleImageUpload}
+            <Form.Item 
+              label="العنوان" 
+              name="title" 
+              rules={[{ required: true, message: "العنوان مطلوب" }]}
             >
-              <Button icon={<UploadOutlined />}>Upload Image</Button>
-            </Upload>
-            {imageUrl && (
-              <img 
-                src={imageUrl} 
-                alt="Preview" 
-                style={{ marginTop: 10, height: 150, objectFit: "cover", borderRadius: 8 }} 
+              <Input placeholder="أدخل عنوان الحديث" style={arabicTextStyle} />
+            </Form.Item>
+
+            <Form.Item label="مرجع" name="refrence">
+              <Input placeholder="أدخل المرجع" style={arabicTextStyle} />
+            </Form.Item>
+
+            <Form.Item 
+              label="الفئة" 
+              name="category"
+              rules={[{ required: true, message: "الفئة مطلوبة" }]}
+            >
+              <Select placeholder="اختر الفئة" style={{ direction: "rtl" }}>
+                {categories.map(cat => (
+                  <Option key={cat._id} value={cat._id}>{cat.name}</Option>
+                ))}
+              </Select>
+            </Form.Item>
+
+            <Form.Item
+              label="حديث (بالعربية)"
+              name="hadith"
+              rules={[{ required: true, message: "نص الحديث مطلوب" }]}
+            >
+              <Input.TextArea 
+                rows={4} 
+                placeholder="أدخل نص الحديث هنا" 
+                style={arabicTextStyle}
+                value={hadith}
+                onChange={(e) => setHadith(e.target.value)}
               />
-            )}
-          </Form.Item> 
+            </Form.Item>
 
-          <Form.Item>
-            <Button 
-              type="primary" 
-              htmlType="submit" 
-              style={{ background: "#2e7d32", border: "none" }}
-            >
-              {editData ? "Update" : "Save"}
-            </Button>
-          </Form.Item>
-        </Form>
+            <Form.Item label="الوصف">
+              <ReactQuill 
+                className="arabic-quill"
+                value={description}  
+                onChange={setDescription} 
+                style={{ height: 200, marginBottom: 50, direction: "rtl" }}
+                placeholder="أدخل الوصف"
+                theme="snow"
+              />
+            </Form.Item>
+
+            <Form.Item label="صورة الحديث (اختياري)">
+              <Upload
+                accept="image/*"
+                showUploadList={false}
+                beforeUpload={() => false}
+                onChange={handleImageUpload}
+              >
+                <Button icon={<UploadOutlined />}>رفع صورة</Button>
+              </Upload>
+              {imageUrl && (
+                <img 
+                  src={imageUrl} 
+                  alt="Preview" 
+                  style={{ marginTop: 10, height: 150, objectFit: "cover", borderRadius: 8 }} 
+                />
+              )}
+            </Form.Item> 
+
+            <Form.Item>
+              <Button 
+                type="primary" 
+                htmlType="submit" 
+                style={{ background: "#2e7d32", border: "none", width: "100px" }}
+              >
+                {editData ? "تحديث" : "حفظ"}
+              </Button>
+            </Form.Item>
+          </Form>
+        </div>
       </Modal>
     </div>
   );

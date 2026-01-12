@@ -31,8 +31,7 @@ const arabicTextStyle = {
   direction: "rtl" as const,
   textAlign: "right" as const,
   fontFamily: "'Traditional Arabic', 'Amiri', serif",
-  fontSize: "18px",
-  lineHeight: "2"
+  fontSize: "16px",
 };
 
 type HadithData = {
@@ -118,9 +117,9 @@ const HadithManagement: React.FC = () => {
       setHadithList(prev =>
         prev.map(h => (h._id === id ? { ...h, status: !current } : h))
       );
-      message.success("Status updated");
+      message.success("تم تحديث الحالة");
     } catch (err) {
-      message.error("Failed to update status");
+      message.error("فشل تحديث الحالة");
     }
   };
 
@@ -128,11 +127,17 @@ const HadithManagement: React.FC = () => {
     try {
       await axiosInstance.delete(`/hadith/${id}`);
       setHadithList(prev => prev.filter(h => h._id !== id));
-      message.success("Hadith deleted");
+      message.success("تم حذف الحديث");
     } catch (err) {
-      message.error("Failed to delete");
+      message.error("فشل الحذف");
     }
   };
+
+  // const handleImageUpload = (info: any) => {
+  //   const file = info.file.originFileObj || info.file;
+  //   setImageFile(file);
+  //   setImageUrl(URL.createObjectURL(file));
+  // };
 
   const handleSubmit = async (values: any) => {
     try {
@@ -152,7 +157,7 @@ const HadithManagement: React.FC = () => {
         res = await axiosInstance.patch(`/hadith/${editData._id}`, formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
-        message.success("Hadith updated successfully");
+        message.success("تم التحديث بنجاح");
         setHadithList(prev =>
           prev.map(h => (h._id === editData._id ? res.data.data : h))
         );
@@ -160,7 +165,7 @@ const HadithManagement: React.FC = () => {
         res = await axiosInstance.post("/hadith", formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
-        message.success("Hadith created successfully");
+        message.success("تم الحفظ بنجاح");
         setHadithList(prev => [...prev, res.data.data]);
       }
 
@@ -174,35 +179,37 @@ const HadithManagement: React.FC = () => {
 
     } catch (err: any) {
       console.error("Hadith save error:", err.response?.data || err);
-      message.error(err.response?.data?.message || "Failed to save Hadith");
+      message.error(err.response?.data?.message || "فشل حفظ الحديث");
     }
   };
 
   const columns = [
     {
-      title: "الرقم التسلسلي",
+      title: "ر.ت.",
       key: "index",
       width: 80,
       render: (_: any, __: any, index: number) => {
-        // Convert index+1 to string, then replace digits with Arabic equivalents
         const arabicNumbers = ["٠", "١", "٢", "٣", "٤", "٥", "٦", "٧", "٨", "٩"];
         return (index + 1)
           .toString()
           .replace(/\d/g, (d) => arabicNumbers[parseInt(d)]);
       },
     },
-    { title: "العنوان", dataIndex: "title", key: "title" },
+
+    { title: "العنوان", dataIndex: "title", key: "title", align: "right" as const },
     {
       title: "الفئات",
       key: "category",
+      align: "right" as const,
       render: (record: HadithData) =>
         typeof record.category === "object" ? record.category?.name : record.category || "-",
     },
-    { title: "المرجع", dataIndex: "refrence", key: "refrence" },
+    { title: "المرجع", dataIndex: "refrence", key: "refrence", align: "right" as const },
 
     {
       title: "الحديث",
       key: "hadith",
+      align: "right" as const,
       render: (record: HadithData) => (
         <div
           style={{ 
@@ -225,6 +232,7 @@ const HadithManagement: React.FC = () => {
     {
       title: "الوصف",
       key: "desc",
+      align: "right" as const,
       render: (record: HadithData) => (
         <div
           dangerouslySetInnerHTML={{ __html: record.description }}
@@ -237,8 +245,9 @@ const HadithManagement: React.FC = () => {
       title: "الحالة",
       key: "status",
       width: 130,
+      align: "center" as const,
       render: (_: any, record: any) => (
-        <button className="flex items-center gap-2 hover:opacity-80 transition">
+        <button className="flex items-center justify-center gap-2 hover:opacity-80 transition w-full">
           {record.status ? (
             <span className="text-green-600 font-medium">نشط</span>
           ) : (
@@ -252,8 +261,9 @@ const HadithManagement: React.FC = () => {
       key: "action",
       width: 150,
       fixed: "right" as const,
+      align: "center" as const,
       render: (_: any, record: any) => (
-        <div className="flex items-center gap-3">
+        <div className="flex items-center justify-center gap-3">
           <button
             onClick={() => {
               setViewData(record);
@@ -298,10 +308,10 @@ const HadithManagement: React.FC = () => {
           </button>
 
           <Popconfirm
-            title="Are you sure to delete this Hadith?"
+            title="هل أنت متأكد من حذف هذا الحديث؟"
             onConfirm={() => deleteHadith(record._id)}
-            okText="Yes"
-            cancelText="No"
+            okText="نعم"
+            cancelText="لا"
           >
             <IoTrashOutline className="text-xl text-red-500 cursor-pointer hover:text-red-700" />
           </Popconfirm>
@@ -309,10 +319,33 @@ const HadithManagement: React.FC = () => {
       ),
     },
   ];
+
   return (
     <div style={{ padding: "24px 40px", background: "#fff", minHeight: "100vh" }}>
+      {/* --- CSS for RTL Support & Modal Fixes --- */}
+      <style>{`
+        .arabic-quill .ql-editor {
+          direction: rtl;
+          text-align: right;
+          font-family: 'Traditional Arabic', 'Amiri', serif;
+          font-size: 18px;
+        }
+        .arabic-quill .ql-editor.ql-blank::before {
+          right: 15px;
+          left: auto;
+          text-align: right;
+        }
+        .ant-modal-title {
+          text-align: right;
+        }
+        .ant-modal-close {
+           right: auto;
+           left: 0;
+        }
+      `}</style>
+
       {/* Top Header */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24, direction: 'rtl' }}>
         <h1 style={{ fontSize: 24, fontWeight: "bold", margin: 0 }}>الحديث</h1>
       </div>
 
@@ -320,16 +353,16 @@ const HadithManagement: React.FC = () => {
       <div style={{ display: "flex", justifyContent: "flex-end", gap: 12, marginBottom: 16 }}>
         <Space>
           <Search
-            placeholder="يبحث"
+            placeholder="بحث"
             allowClear
             onChange={(e) => setSearchText(e.target.value)}
-            style={{ width: 250 }}
+            style={{ width: 250, direction: "rtl" }}
           />
         </Space>
         <Select
           placeholder="فئات"
           allowClear
-          style={{ width: 180 }}
+          style={{ width: 180, direction: "rtl" }}
           onChange={(v) => setFilterCategory(v || undefined)}
         >
           {categories.map((cat) => (
@@ -341,7 +374,7 @@ const HadithManagement: React.FC = () => {
           placeholder="مرجع"
           allowClear
           showSearch
-          style={{ width: 200 }}
+          style={{ width: 200, direction: "rtl" }}
           onChange={(v) => setFilterReference(v || undefined)}
         >
           {Array.from(new Set(hadithList.map(h => h.refrence).filter(Boolean))).map(ref => (
@@ -375,28 +408,30 @@ const HadithManagement: React.FC = () => {
         pagination={{ pageSize: 10 }}
         scroll={{ x: 1300 }}
         bordered={false}
+        // Force text alignment for rows
+        rowClassName={() => "text-right"}
       />
 
       {/* View Modal */}
       <Modal
-        title="View Hadith"
+        title={<div style={{ textAlign: "right" }}>عرض الحديث</div>}
         open={isViewModalOpen}
         footer={null}
         onCancel={() => setIsViewModalOpen(false)}
         width={700}
+        style={{ direction: 'rtl' }}
       >
         {viewData && (
-          <div className="space-y-4">
+          <div className="space-y-4" style={{ textAlign: "right", direction: "rtl" }}>
             <h3 className="text-xl font-bold">{viewData.title}</h3>
-            <p><strong>Reference:</strong> {viewData.refrence}</p>
-            <p><strong>Category:</strong> {typeof viewData.category === "object" ? viewData.category?.name : viewData.category}</p>
-            <p><strong>Daily:</strong> {viewData.daily ? "Yes" : "No"}</p>
+            <p><strong>المرجع:</strong> {viewData.refrence}</p>
+            <p><strong>الفئة:</strong> {typeof viewData.category === "object" ? viewData.category?.name : viewData.category}</p>
+            
             {viewData.icon && (
               <img src={getImageUrl(viewData.icon)} alt="icon" className="w-32 h-32 object-cover rounded" />
             )}
             
-            <p className="font-bold mt-4">Hadith Text:</p>
-            {/* UPDATED: Container for View Modal Hadith */}
+            <p className="font-bold mt-4">نص الحديث:</p>
             <div style={{
               background: "#f8f9fa",
               padding: "15px",
@@ -407,7 +442,7 @@ const HadithManagement: React.FC = () => {
               {viewData.hadith}
             </div>
 
-            <p className="font-bold mt-4">Description:</p>
+            <p className="font-bold mt-4">الوصف:</p>
             <div dangerouslySetInnerHTML={{ __html: viewData.description }} />
           </div>
         )}
@@ -424,74 +459,94 @@ const HadithManagement: React.FC = () => {
           form.resetFields();
           setHadith("");
           setDescription("");
-          setImageFile(null);
-          setImageUrl(null);
+          // setImageFile(null);
+          // setImageUrl(null);
         }}
         width={800}
       >
-        <Form 
-          form={form} 
-          layout="vertical" 
-          onFinish={handleSubmit}
-          initialValues={{ daily: false }}
-        >
-          <Form.Item 
-            label="العنوان" 
-            name="title" 
-            rules={[{ required: true, message: "العنوان مطلوب" }]}
+        <div dir="rtl">
+          <Form 
+            form={form} 
+            layout="vertical" 
+            onFinish={handleSubmit}
+            initialValues={{ daily: false }}
           >
-            <Input placeholder="أدخل عنوان الحديث" style={arabicTextStyle} />
-          </Form.Item>
-
-          <Form.Item label="مرجع" name="refrence">
-            <Input placeholder="أدخل المرجع" style={arabicTextStyle} />
-          </Form.Item>
-
-          <Form.Item 
-            label="الفئة" 
-            name="category"
-            rules={[{ required: true, message: "الفئة مطلوبة" }]}
-          >
-            <Select placeholder="اختر الفئة" style={arabicTextStyle}>
-              {categories.map(cat => (
-                <Option key={cat._id} value={cat._id}>{cat.name}</Option>
-              ))}
-            </Select>
-          </Form.Item>
-
-          <Form.Item
-            label="حديث (بالعربية)"
-            name="hadith"
-            rules={[{ required: true, message: "نص الحديث مطلوب" }]}
-          >
-            {/* UPDATED: Input Field for Arabic RTL */}
-            <Input.TextArea 
-              rows={6} 
-              placeholder="أدخل نص الحديث هنا" 
-              value={hadith}
-              onChange={(e) => setHadith(e.target.value)}
-              style={arabicTextStyle}
-            />
-          </Form.Item>
-
-          <Form.Item label="الوصف">
-            <ReactQuill 
-              value={description} 
-              onChange={setDescription} 
-              style={{ height: 200, marginBottom: 50 }} 
-            />
-          </Form.Item>
-
-          <Form.Item>
-            <Button 
-              type="primary" 
-              htmlType="submit" 
-              style={{ background: "#2e7d32", border: "none" }}
+            <Form.Item 
+              label="العنوان" 
+              name="title" 
+              rules={[{ required: true, message: "العنوان مطلوب" }]}
             >
-              {editData ? "Update" : "Save"}
-            </Button>
-          </Form.Item>
-        </Form>
+              <Input placeholder="أدخل عنوان الحديث" style={arabicTextStyle} />
+            </Form.Item>
+
+            <Form.Item label="مرجع" name="refrence">
+              <Input placeholder="أدخل المرجع" style={arabicTextStyle} />
+            </Form.Item>
+
+            <Form.Item 
+              label="الفئة" 
+              name="category"
+              rules={[{ required: true, message: "الفئة مطلوبة" }]}
+            >
+              <Select placeholder="اختر الفئة" style={{ direction: 'rtl' }}>
+                {categories.map(cat => (
+                  <Option key={cat._id} value={cat._id}>{cat.name}</Option>
+                ))}
+              </Select>
+            </Form.Item>
+
+            <Form.Item
+              label="حديث (بالعربية)"
+              name="hadith"
+              rules={[{ required: true, message: "نص الحديث مطلوب" }]}
+            >
+              <Input.TextArea 
+                rows={6} 
+                placeholder="أدخل نص الحديث هنا" 
+                value={hadith}
+                onChange={(e) => setHadith(e.target.value)}
+                style={arabicTextStyle}
+              />
+            </Form.Item>
+
+            <Form.Item label="الوصف">
+              <ReactQuill 
+                className="arabic-quill"
+                value={description} 
+                onChange={setDescription} 
+                style={{ height: 200, marginBottom: 50, direction: "rtl" }}
+              />
+            </Form.Item>
+
+             {/* <Form.Item label="صورة الحديث (اختياري)">
+              <Upload
+                accept="image/*"
+                showUploadList={false}
+                beforeUpload={() => false}
+                onChange={handleImageUpload}
+              >
+                <Button icon={<UploadOutlined />}>رفع صورة</Button>
+              </Upload>
+              {imageUrl && (
+                <img 
+                  src={imageUrl} 
+                  alt="Preview" 
+                  style={{ marginTop: 10, height: 150, objectFit: "cover", borderRadius: 8 }} 
+                />
+              )}
+            </Form.Item> */}
+
+            <Form.Item>
+              <Button 
+                type="primary" 
+                htmlType="submit" 
+                style={{ background: "#2e7d32", border: "none" }}
+              >
+                {editData ? "تحديث" : "حفظ"}
+              </Button>
+            </Form.Item>
+          </Form>
+        </div>
       </Modal>
     </div>
   );

@@ -38,7 +38,7 @@ const categorys = () => {
       const term = searchTerm.toLowerCase();
       const filtered = categories.filter((cat) =>
         (cat.name || "").toLowerCase().includes(term) ||
-        (cat.status ? "active" : "inactive").includes(term)
+        (cat.status ? "نشط" : "غير نشط").includes(term)
       );
       setFilteredCategories(filtered);
     }
@@ -69,13 +69,13 @@ const categorys = () => {
 
   const columns = [
     {
-      title: "Name",
+      title: "اسم",
       dataIndex: "name",
       key: "name",
       align: "center" as const,
     },
     {
-      title: "Icon",
+      title: "رمز",
       dataIndex: "image",
       key: "image",
       render: (img: string) => (
@@ -87,7 +87,7 @@ const categorys = () => {
       ),
     },
     {
-      title: "Status",
+      title: "الحالة",
       dataIndex: "status",
       key: "status",
       render: (_: any, record: any) => (
@@ -95,18 +95,18 @@ const categorys = () => {
           {record.status ? (
             <div className="flex items-center gap-1">
               
-              <span className="text-green-600 font-medium">Active</span>
+              <span className="text-green-600 font-medium">نشط</span>
             </div>
           ) : (
             <div className="flex items-center gap-1">
-              <span className="text-red-600 font-medium">Inactive</span>
+              <span className="text-red-600 font-medium">غير نشط</span>
             </div>
           )}
         </button>
       ),
     },
     {
-      title: "Action",
+      title: "الإجراء",
       key: "action",
       render: (_: any, record: any) => (
         <div className="flex items-center gap-3">
@@ -139,11 +139,11 @@ const categorys = () => {
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl text-primary font-semibold">Categories</h1>
+        <h1 className="text-2xl text-primary font-semibold">الفئات</h1>
 
         <div className="flex items-center gap-3">
           <Search
-            placeholder="Search categories..."
+            placeholder="ابحث في الفئات..."
             allowClear
             onChange={(e) => setSearchTerm(e.target.value)}
             style={{ width: 250 }}
@@ -157,7 +157,7 @@ const categorys = () => {
           style={{ height: 40 }}
           onClick={() => { setIsOpen(true); setEditData(null); }}
         >
-          Add New
+          إضافة فئة جديدة
         </Button >
       </div>
       </div>
